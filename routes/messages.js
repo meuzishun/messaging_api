@@ -1,15 +1,15 @@
+const {
+  getMessage,
+  getMessages,
+  postNewMessage,
+} = require('../controllers/messageControllers');
+
 const router = require('express').Router();
 
-router.get('/', (req, res) => {
-  res.send('Messages route GET');
-});
+router.get('/', getMessages);
 
-router.get('/:messageId', (req, res) => {
-  res.send(`Message ${req.params.messageId} route GET`);
-});
+router.get('/:messageId', getMessage);
 
-router.post('/new', (req, res) => {
-  res.send('New message route POST');
-});
+router.post('/new', postNewMessage);
 
 module.exports = router;
