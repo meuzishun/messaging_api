@@ -1,5 +1,5 @@
 const postRegister = (req, res) => {
-  res.send('Register POST route');
+  return res.send('Register POST route');
 };
 
 const postLogin = (req, res) => {
