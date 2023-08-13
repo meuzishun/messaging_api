@@ -1,19 +1,18 @@
+const {
+  postRegister,
+  postLogin,
+  getProfile,
+  postProfileEdit,
+} = require('../controllers/authControllers');
+
 const router = require('express').Router();
 
-router.post('/register', (req, res) => {
-  res.send('Register POST route');
-});
+router.post('/register', postRegister);
 
-router.post('/login', (req, res) => {
-  res.send('Login POST route');
-});
+router.post('/login', postLogin);
 
-router.get('/profile', (req, res) => {
-  res.send('Profile GET route');
-});
+router.get('/profile', getProfile);
 
-router.post('/profile/edit', (req, res) => {
-  res.send('Edit profile POST route');
-});
+router.post('/profile/edit', postProfileEdit);
 
 module.exports = router;
