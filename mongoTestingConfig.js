@@ -20,4 +20,11 @@ const initializeMongoServer = async () => {
   });
 };
 
-module.exports = initializeMongoServer;
+const disconnectMongoServer = async () => {
+  mongoose.connection.on('disconnected', () => {
+    console.log('Mocked MongoDB successfully disconnected');
+  });
+  await mongoose.disconnect();
+};
+
+module.exports = { initializeMongoServer, disconnectMongoServer };
