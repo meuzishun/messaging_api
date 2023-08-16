@@ -21,70 +21,147 @@ describe('Auth controllers', () => {
       expect(res.status).not.toBe(404);
     });
 
-    test('returns registered user sent', async () => {
-      const user = {
-        firstName: 'Andrew',
-        lastName: 'Smith',
-        email: 'asmith@email.com',
-      };
-      const res = await request(app).post('/register').send({ user });
-      expect(res.status).toBe(201);
-      expect(res.body.user.firstName).toEqual(user.firstName);
-      expect(res.body.user.lastName).toEqual(user.lastName);
-      expect(res.body.user.email).toEqual(user.email);
-    });
-
-    test('responds with error when user not sent with body', async () => {
-      const res = await request(app).post('/register');
-      expect(res.status).toBe(400);
-      expect(res.body.msg).toBe('No user sent');
-    });
-
     test('responds with json no matter what', async () => {
       const res = await request(app).post('/register');
       expect(res.headers['content-type']).toMatch(/json/);
     });
 
-    test('responds with error when attempting to register a user that already exists', async () => {
+    test('responds with 400 status when user not sent with body', async () => {
+      const res = await request(app).post('/register');
+      expect(res.status).toBe(400);
+    });
+
+    test('responds with error msg when user not sent with body', async () => {
+      const res = await request(app).post('/register');
+      expect(res.body.msg).toBe('No user sent');
+    });
+
+    test('responds with 400 status when attempting to register a user that already exists', async () => {
       const user = {
         firstName: 'Maggie',
         lastName: 'May',
         email: 'maggie@email.com',
+        password: '1234password5678',
       };
       await request(app).post('/register').send({ user });
       const res = await request(app).post('/register').send({ user });
       expect(res.status).toBe(400);
+    });
+
+    test('responds with error msg when attempting to register a user that already exists', async () => {
+      const user = {
+        firstName: 'Maggie',
+        lastName: 'May',
+        email: 'maggie@email.com',
+        password: '1234password5678',
+      };
+      await request(app).post('/register').send({ user });
+      const res = await request(app).post('/register').send({ user });
       expect(res.body.msg).toBe('User already exists');
     });
 
-    test('responds with error when attempting to register a user without a first name', async () => {
+    test('responds with 400 status when attempting to register a user without a first name', async () => {
       const user = {
         lastName: 'Hattori',
         email: 'ayako@email.com',
+        password: '1234password5678',
       };
       const res = await request(app).post('/register').send({ user });
       expect(res.status).toBe(400);
+    });
+
+    test('responds with error msg when attempting to register a user without a first name', async () => {
+      const user = {
+        lastName: 'Hattori',
+        email: 'ayako@email.com',
+        password: '1234password5678',
+      };
+      const res = await request(app).post('/register').send({ user });
       expect(res.body.msg).toBe('No first name');
     });
 
-    test('responds with error when attempting to register a user without a last name', async () => {
+    test('responds with 400 status when attempting to register a user without a last name', async () => {
       const user = {
         firstName: 'Ayako',
+        email: 'ayako@email.com',
+        password: '1234password5678',
+      };
+      const res = await request(app).post('/register').send({ user });
+      expect(res.status).toBe(400);
+    });
+
+    test('responds with error msg when attempting to register a user without a last name', async () => {
+      const user = {
+        firstName: 'Ayako',
+        email: 'ayako@email.com',
+        password: '1234password5678',
+      };
+      const res = await request(app).post('/register').send({ user });
+      expect(res.body.msg).toBe('No last name');
+    });
+
+    test('responds with 400 status when attempting to register a user without an email', async () => {
+      const user = {
+        firstName: 'Ayako',
+        lastName: 'Hattori',
+        password: '1234password5678',
+      };
+      const res = await request(app).post('/register').send({ user });
+      expect(res.status).toBe(400);
+    });
+
+    test('responds with error msg when attempting to register a user without an email', async () => {
+      const user = {
+        firstName: 'Ayako',
+        lastName: 'Hattori',
+        password: '1234password5678',
+      };
+      const res = await request(app).post('/register').send({ user });
+      expect(res.body.msg).toBe('No email');
+    });
+
+    test('responds with 400 status when attempting to register a user without a password', async () => {
+      const user = {
+        firstName: 'Ayako',
+        lastName: 'Hattori',
         email: 'ayako@email.com',
       };
       const res = await request(app).post('/register').send({ user });
       expect(res.status).toBe(400);
-      expect(res.body.msg).toBe('No last name');
     });
 
-    test('responds with error when attempting to register a user without an email', async () => {
+    test('responds with error msg when attempting to register a user without a password', async () => {
       const user = {
         firstName: 'Ayako',
         lastName: 'Hattori',
+        email: 'ayako@email.com',
       };
       const res = await request(app).post('/register').send({ user });
-      expect(res.status).toBe(400);
-      expect(res.body.msg).toBe('No email');
+      expect(res.body.msg).toBe('No password');
+    });
+
+    test('responds with 201 status when register successful', async () => {
+      const user = {
+        firstName: 'Ayako',
+        lastName: 'Hattori',
+        email: 'ayako@email.com',
+        password: '1234password5678',
+      };
+      const res = await request(app).post('/register').send({ user });
+      expect(res.status).toBe(201);
+    });
+
+    test('responds with user profile when register successful', async () => {
+      const user = {
+        firstName: 'Andrew',
+        lastName: 'Smith',
+        email: 'asmith@email.com',
+        password: '1234password5678',
+      };
+      const res = await request(app).post('/register').send({ user });
+      expect(res.body.user.firstName).toEqual(user.firstName);
+      expect(res.body.user.lastName).toEqual(user.lastName);
+      expect(res.body.user.email).toEqual(user.email);
     });
   });
 
