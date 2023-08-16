@@ -93,6 +93,71 @@ describe('Auth controllers', () => {
       const res = await request(app).post('/login');
       expect(res.status).not.toBe(404);
     });
+
+    test('responds with 400 error when nothing is submitted', async () => {
+      const res = await request(app).post('/login');
+      expect(res.status).toBe(400);
+    });
+
+    test('responds with msg when nothing is submitted', async () => {
+      const res = await request(app).post('/login');
+      expect(res.body.msg).toBe('No user submitted');
+    });
+
+    test('responds with 400 error when no password is submitted', async () => {
+      const loginData = {
+        email: 'me@email.com',
+      };
+      const res = await request(app).post('/login').send(loginData);
+      expect(res.status).toBe(400);
+    });
+
+    test('responds with error msg when no password is submitted', async () => {
+      const loginData = {
+        email: 'me@email.com',
+      };
+      const res = await request(app).post('/login').send(loginData);
+      expect(res.body.msg).toBe('No password');
+    });
+
+    test('responds with error when no email is submitted', async () => {
+      const loginData = {
+        password: '1234password5678',
+      };
+      const res = await request(app).post('/login').send(loginData);
+      expect(res.status).toBe(400);
+    });
+
+    test('responds with error msg when no email is submitted', async () => {
+      const loginData = {
+        password: '1234password5678',
+      };
+      const res = await request(app).post('/login').send(loginData);
+      expect(res.body.msg).toBe('No email');
+    });
+
+    test('responds with 400 error when no user exists with submitted email', async () => {
+      const loginData = {
+        email: 'me@email.com',
+        password: '1234password5678',
+      };
+      const res = await request(app).post('/login').send(loginData);
+      expect(res.status).toBe(400);
+    });
+
+    test('responds with error msg when no user exists with submitted email', async () => {
+      const loginData = {
+        email: 'me@email.com',
+        password: '1234password5678',
+      };
+      const res = await request(app).post('/login').send(loginData);
+      expect(res.body.msg).toBe('No user with that email');
+    });
+
+    // TODO: Login responds with 400 error when password is incorrect
+    // TODO: Login responds with error msg when password is incorrect
+    // TODO: Login responds with 200 when login is successful
+    // TODO: Login responds with user when login is successful
   });
 
   describe('Contacts route', () => {
