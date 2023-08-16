@@ -4,7 +4,7 @@ const postRegister = async (req, res) => {
   if (!req.body.user) {
     return res.status(400).json({ msg: 'No user sent' });
   }
-  const { firstName, lastName, email } = req.body.user;
+  const { firstName, lastName, email, password } = req.body.user;
 
   const userSearch = await User.findOne({ email });
   if (userSearch) {
@@ -21,6 +21,10 @@ const postRegister = async (req, res) => {
 
   if (!email) {
     return res.status(400).json({ msg: 'No email' });
+  }
+
+  if (!password) {
+    return res.status(400).json({ msg: 'No password' });
   }
 
   const user = await User.create(req.body.user);
