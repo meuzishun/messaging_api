@@ -27,8 +27,24 @@ const postRegister = async (req, res) => {
   return res.status(201).json({ user });
 };
 
-const postLogin = (req, res) => {
-  res.send('Login POST route');
+const postLogin = async (req, res) => {
+  if (Object.keys(req.body).length === 0) {
+    return res.status(400).json({ msg: 'No user submitted' });
+  }
+  const { email, password } = req.body;
+
+  if (!password) {
+    return res.status(400).json({ msg: 'No password' });
+  }
+
+  if (!email) {
+    return res.status(400).json({ msg: 'No email' });
+  }
+
+  const users = await User.find({ email });
+  if (users.length === 0) {
+    return res.status(400).json({ msg: 'No user with that email' });
+  }
 };
 
 module.exports = {
