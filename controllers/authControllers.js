@@ -1,15 +1,11 @@
 const User = require('../models/user');
 
 const postRegister = async (req, res) => {
-  if (!req.body.user) {
-    return res.status(400).json({ msg: 'No user sent' });
+  if (Object.keys(req.body).length === 0) {
+    return res.status(400).json({ msg: 'No user data submitted' });
   }
-  const { firstName, lastName, email, password } = req.body.user;
 
-  const userSearch = await User.findOne({ email });
-  if (userSearch) {
-    return res.status(400).json({ msg: 'User already exists' });
-  }
+  const { firstName, lastName, email, password } = req.body;
 
   if (!firstName) {
     return res.status(400).json({ msg: 'No first name' });
@@ -27,7 +23,13 @@ const postRegister = async (req, res) => {
     return res.status(400).json({ msg: 'No password' });
   }
 
-  const user = await User.create(req.body.user);
+  const userExists = await User.findOne({ email });
+
+  if (userExists) {
+    return res.status(400).json({ msg: 'User already exists' });
+  }
+
+  const user = await User.create(req.body);
   return res.status(201).json({ user });
 };
 
