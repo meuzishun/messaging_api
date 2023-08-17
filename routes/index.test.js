@@ -176,9 +176,9 @@ describe('Auth controllers', () => {
       expect(res.status).toBe(400);
     });
 
-    test('responds with msg when nothing is submitted', async () => {
+    test('responds with error msg when nothing is submitted', async () => {
       const res = await request(app).post('/login');
-      expect(res.body.msg).toBe('No user submitted');
+      expect(res.error.text).toContain('No user submitted');
     });
 
     test('responds with 400 error when no password is submitted', async () => {
@@ -194,7 +194,7 @@ describe('Auth controllers', () => {
         email: 'me@email.com',
       };
       const res = await request(app).post('/login').send(loginData);
-      expect(res.body.msg).toBe('No password');
+      expect(res.error.text).toContain('No password');
     });
 
     test('responds with error when no email is submitted', async () => {
@@ -210,7 +210,7 @@ describe('Auth controllers', () => {
         password: '1234password5678',
       };
       const res = await request(app).post('/login').send(loginData);
-      expect(res.body.msg).toBe('No email');
+      expect(res.error.text).toContain('No email');
     });
 
     test('responds with 400 error when no user exists with submitted email', async () => {
@@ -228,13 +228,59 @@ describe('Auth controllers', () => {
         password: '1234password5678',
       };
       const res = await request(app).post('/login').send(loginData);
-      expect(res.body.msg).toBe('No user with that email');
+      expect(res.error.text).toContain('No user with that email');
     });
 
-    // TODO: Login responds with 400 error when password is incorrect
-    // TODO: Login responds with error msg when password is incorrect
-    // TODO: Login responds with 200 when login is successful
-    // TODO: Login responds with user when login is successful
+    test('responds with 400 error when password is incorrect', async () => {
+      const registerData = {
+        firstName: 'Billy',
+        lastName: 'Madison',
+        email: 'billy@email.com',
+        password: '1234password5678',
+      };
+      await request(app).post('/register').send(registerData);
+      const loginData = {
+        ...registerData,
+        password: 'thisIsIncorrect',
+      };
+      const res = await request(app).post('/login').send(loginData);
+      expect(res.status).toBe(400);
+    });
+
+    test('responds with error msg when password is incorrect', async () => {
+      const loginData = {
+        firstName: 'Billy',
+        lastName: 'Madison',
+        email: 'billy@email.com',
+        password: 'thisIsIncorrect',
+      };
+      const res = await request(app).post('/login').send(loginData);
+      expect(res.error.text).toContain('Incorrect password');
+    });
+
+    test('responds with 200 when login is successful', async () => {
+      const loginData = {
+        firstName: 'Billy',
+        lastName: 'Madison',
+        email: 'billy@email.com',
+        password: '1234password5678',
+      };
+      const res = await request(app).post('/login').send(loginData);
+      expect(res.status).toBe(200);
+    });
+
+    test('responds with user when login is successful', async () => {
+      const loginData = {
+        firstName: 'Billy',
+        lastName: 'Madison',
+        email: 'billy@email.com',
+        password: '1234password5678',
+      };
+      const res = await request(app).post('/login').send(loginData);
+      expect(res.body.firstName).toEqual(loginData.firstName);
+      expect(res.body.lastName).toEqual(loginData.lastName);
+      expect(res.body.email).toEqual(loginData.email);
+    });
   });
 
   describe('Contacts route', () => {
