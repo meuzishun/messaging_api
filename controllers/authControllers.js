@@ -1,37 +1,44 @@
+const asyncHandler = require('express-async-handler');
 const User = require('../models/user');
 
-const postRegister = async (req, res) => {
+const postRegister = asyncHandler(async (req, res) => {
   if (Object.keys(req.body).length === 0) {
-    return res.status(400).json({ msg: 'No user data submitted' });
+    res.status(400);
+    throw new Error('No user data submitted');
   }
 
   const { firstName, lastName, email, password } = req.body;
 
   if (!firstName) {
-    return res.status(400).json({ msg: 'No first name' });
+    res.status(400);
+    throw new Error('No first name');
   }
 
   if (!lastName) {
-    return res.status(400).json({ msg: 'No last name' });
+    res.status(400);
+    throw new Error('No last name');
   }
 
   if (!email) {
-    return res.status(400).json({ msg: 'No email' });
+    res.status(400);
+    throw new Error('No email');
   }
 
   if (!password) {
-    return res.status(400).json({ msg: 'No password' });
+    res.status(400);
+    throw new Error('No password');
   }
 
   const userExists = await User.findOne({ email });
 
   if (userExists) {
-    return res.status(400).json({ msg: 'User already exists' });
+    res.status(400);
+    throw new Error('User already exists');
   }
 
   const user = await User.create(req.body);
   return res.status(201).json({ user });
-};
+});
 
 const postLogin = async (req, res) => {
   if (Object.keys(req.body).length === 0) {
