@@ -40,25 +40,37 @@ const postRegister = asyncHandler(async (req, res) => {
   return res.status(201).json({ user });
 });
 
-const postLogin = async (req, res) => {
+const postLogin = asyncHandler(async (req, res) => {
   if (Object.keys(req.body).length === 0) {
-    return res.status(400).json({ msg: 'No user submitted' });
+    res.status(400);
+    throw new Error('No user submitted');
   }
   const { email, password } = req.body;
 
   if (!password) {
-    return res.status(400).json({ msg: 'No password' });
+    res.status(400);
+    throw new Error('No password');
   }
 
   if (!email) {
-    return res.status(400).json({ msg: 'No email' });
+    res.status(400);
+    throw new Error('No email');
   }
 
   const users = await User.find({ email });
+
   if (users.length === 0) {
-    return res.status(400).json({ msg: 'No user with that email' });
+    res.status(400);
+    throw new Error('No user with that email');
   }
-};
+
+  if (users[0].password !== password) {
+    res.status(400);
+    throw new Error('Incorrect password');
+  }
+
+  return res.status(200).json(users[0]);
+});
 
 module.exports = {
   postRegister,
