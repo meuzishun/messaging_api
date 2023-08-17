@@ -33,31 +33,7 @@ describe('Auth controllers', () => {
 
     test('responds with error msg when user not sent with body', async () => {
       const res = await request(app).post('/register');
-      expect(res.body.msg).toBe('No user sent');
-    });
-
-    test('responds with 400 status when attempting to register a user that already exists', async () => {
-      const user = {
-        firstName: 'Maggie',
-        lastName: 'May',
-        email: 'maggie@email.com',
-        password: '1234password5678',
-      };
-      await request(app).post('/register').send({ user });
-      const res = await request(app).post('/register').send({ user });
-      expect(res.status).toBe(400);
-    });
-
-    test('responds with error msg when attempting to register a user that already exists', async () => {
-      const user = {
-        firstName: 'Maggie',
-        lastName: 'May',
-        email: 'maggie@email.com',
-        password: '1234password5678',
-      };
-      await request(app).post('/register').send({ user });
-      const res = await request(app).post('/register').send({ user });
-      expect(res.body.msg).toBe('User already exists');
+      expect(res.error.text).toContain('No user data submitted');
     });
 
     test('responds with 400 status when attempting to register a user without a first name', async () => {
@@ -76,7 +52,7 @@ describe('Auth controllers', () => {
         email: 'ayako@email.com',
         password: '1234password5678',
       };
-      const res = await request(app).post('/register').send({ user });
+      const res = await request(app).post('/register').send(user);
       expect(res.body.msg).toBe('No first name');
     });
 
@@ -86,7 +62,7 @@ describe('Auth controllers', () => {
         email: 'ayako@email.com',
         password: '1234password5678',
       };
-      const res = await request(app).post('/register').send({ user });
+      const res = await request(app).post('/register').send(user);
       expect(res.status).toBe(400);
     });
 
@@ -96,7 +72,7 @@ describe('Auth controllers', () => {
         email: 'ayako@email.com',
         password: '1234password5678',
       };
-      const res = await request(app).post('/register').send({ user });
+      const res = await request(app).post('/register').send(user);
       expect(res.body.msg).toBe('No last name');
     });
 
@@ -106,7 +82,7 @@ describe('Auth controllers', () => {
         lastName: 'Hattori',
         password: '1234password5678',
       };
-      const res = await request(app).post('/register').send({ user });
+      const res = await request(app).post('/register').send(user);
       expect(res.status).toBe(400);
     });
 
@@ -116,7 +92,7 @@ describe('Auth controllers', () => {
         lastName: 'Hattori',
         password: '1234password5678',
       };
-      const res = await request(app).post('/register').send({ user });
+      const res = await request(app).post('/register').send(user);
       expect(res.body.msg).toBe('No email');
     });
 
@@ -126,7 +102,7 @@ describe('Auth controllers', () => {
         lastName: 'Hattori',
         email: 'ayako@email.com',
       };
-      const res = await request(app).post('/register').send({ user });
+      const res = await request(app).post('/register').send(user);
       expect(res.status).toBe(400);
     });
 
@@ -136,8 +112,32 @@ describe('Auth controllers', () => {
         lastName: 'Hattori',
         email: 'ayako@email.com',
       };
-      const res = await request(app).post('/register').send({ user });
+      const res = await request(app).post('/register').send(user);
       expect(res.body.msg).toBe('No password');
+    });
+
+    test('responds with 400 status when attempting to register a user that already exists', async () => {
+      const user = {
+        firstName: 'Maggie',
+        lastName: 'May',
+        email: 'maggie@email.com',
+        password: '1234password5678',
+      };
+      await request(app).post('/register').send(user);
+      const res = await request(app).post('/register').send(user);
+      expect(res.status).toBe(400);
+    });
+
+    test('responds with error msg when attempting to register a user that already exists', async () => {
+      const user = {
+        firstName: 'Maggie',
+        lastName: 'May',
+        email: 'maggie@email.com',
+        password: '1234password5678',
+      };
+      await request(app).post('/register').send(user);
+      const res = await request(app).post('/register').send(user);
+      expect(res.body.msg).toBe('User already exists');
     });
 
     test('responds with 201 status when register successful', async () => {
@@ -147,7 +147,7 @@ describe('Auth controllers', () => {
         email: 'ayako@email.com',
         password: '1234password5678',
       };
-      const res = await request(app).post('/register').send({ user });
+      const res = await request(app).post('/register').send(user);
       expect(res.status).toBe(201);
     });
 
@@ -158,7 +158,7 @@ describe('Auth controllers', () => {
         email: 'asmith@email.com',
         password: '1234password5678',
       };
-      const res = await request(app).post('/register').send({ user });
+      const res = await request(app).post('/register').send(user);
       expect(res.body.user.firstName).toEqual(user.firstName);
       expect(res.body.user.lastName).toEqual(user.lastName);
       expect(res.body.user.email).toEqual(user.email);
