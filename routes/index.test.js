@@ -53,7 +53,7 @@ describe('Auth controllers', () => {
         password: '1234password5678',
       };
       const res = await request(app).post('/register').send(user);
-      expect(res.body.msg).toBe('No first name');
+      expect(res.error.text).toContain('No first name');
     });
 
     test('responds with 400 status when attempting to register a user without a last name', async () => {
@@ -73,7 +73,7 @@ describe('Auth controllers', () => {
         password: '1234password5678',
       };
       const res = await request(app).post('/register').send(user);
-      expect(res.body.msg).toBe('No last name');
+      expect(res.error.text).toContain('No last name');
     });
 
     test('responds with 400 status when attempting to register a user without an email', async () => {
@@ -93,7 +93,7 @@ describe('Auth controllers', () => {
         password: '1234password5678',
       };
       const res = await request(app).post('/register').send(user);
-      expect(res.body.msg).toBe('No email');
+      expect(res.error.text).toContain('No email');
     });
 
     test('responds with 400 status when attempting to register a user without a password', async () => {
@@ -113,7 +113,7 @@ describe('Auth controllers', () => {
         email: 'ayako@email.com',
       };
       const res = await request(app).post('/register').send(user);
-      expect(res.body.msg).toBe('No password');
+      expect(res.error.text).toContain('No password');
     });
 
     test('responds with 400 status when attempting to register a user that already exists', async () => {
@@ -137,7 +137,7 @@ describe('Auth controllers', () => {
       };
       await request(app).post('/register').send(user);
       const res = await request(app).post('/register').send(user);
-      expect(res.body.msg).toBe('User already exists');
+      expect(res.error.text).toContain('User already exists');
     });
 
     test('responds with 201 status when register successful', async () => {
