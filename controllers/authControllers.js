@@ -2,12 +2,12 @@ const asyncHandler = require('express-async-handler');
 const User = require('../models/user');
 
 const postRegister = asyncHandler(async (req, res) => {
-  if (Object.keys(req.body).length === 0) {
+  if (!req.body.data) {
     res.status(400);
     throw new Error('No user data submitted');
   }
 
-  const { firstName, lastName, email, password } = req.body;
+  const { firstName, lastName, email, password } = req.body.data;
 
   if (!firstName) {
     res.status(400);
@@ -36,16 +36,16 @@ const postRegister = asyncHandler(async (req, res) => {
     throw new Error('User already exists');
   }
 
-  const user = await User.create(req.body);
+  const user = await User.create(req.body.data);
   return res.status(201).json({ user });
 });
 
 const postLogin = asyncHandler(async (req, res) => {
-  if (Object.keys(req.body).length === 0) {
+  if (!req.body.data) {
     res.status(400);
     throw new Error('No user submitted');
   }
-  const { email, password } = req.body;
+  const { email, password } = req.body.data;
 
   if (!password) {
     res.status(400);
@@ -57,19 +57,19 @@ const postLogin = asyncHandler(async (req, res) => {
     throw new Error('No email');
   }
 
-  const users = await User.find({ email });
+  const user = await User.findOne({ email });
 
-  if (users.length === 0) {
+  if (!user) {
     res.status(400);
     throw new Error('No user with that email');
   }
 
-  if (users[0].password !== password) {
+  if (user.password !== password) {
     res.status(400);
     throw new Error('Incorrect password');
   }
 
-  return res.status(200).json(users[0]);
+  return res.status(200).json({ user });
 });
 
 module.exports = {
