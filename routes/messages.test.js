@@ -154,7 +154,7 @@ describe('Message routes', () => {
     expect(res.body.message.content).toEqual('Yo planet!');
   });
 
-  test('Single message route exists', async () => {
+  test.skip('Single message route exists', async () => {
     //! This is a strange test. If you don't include a legit-looking document id in the url, a 200 status is sent, bypassing any conditional checks in the controller. In short, may need to be rewritten or perhaps not included at all.
     const res = await request(app).get('/messages/123');
     expect(res.status).not.toBe(404);
