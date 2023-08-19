@@ -16,22 +16,27 @@ const getMessage = asyncHandler(async (req, res) => {
 });
 
 const postNewMessage = asyncHandler(async (req, res) => {
-  if (Object.keys(req.body).length === 0) {
+  if (!req.body.data) {
     res.status(400);
     throw new Error('No message submitted');
   }
 
-  if (!req.body.content) {
+  const { content, author } = req.body.data;
+
+  if (!content) {
     res.status(400);
     throw new Error('No message content submitted');
   }
 
-  if (!req.body.author) {
+  if (!author) {
     res.status(400);
     throw new Error('No author submitted');
   }
 
-  const message = await Message.create({ ...req.body, timestamp: new Date() });
+  const message = await Message.create({
+    ...req.body.data,
+    timestamp: new Date(),
+  });
   return res.status(201).json({ message });
 });
 
