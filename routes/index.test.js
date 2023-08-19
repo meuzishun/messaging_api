@@ -37,131 +37,131 @@ describe('Auth controllers', () => {
     });
 
     test('responds with 400 status when attempting to register a user without a first name', async () => {
-      const user = {
+      const data = {
         lastName: 'Hattori',
         email: 'ayako@email.com',
         password: '1234password5678',
       };
-      const res = await request(app).post('/register').send({ user });
+      const res = await request(app).post('/register').send({ data });
       expect(res.status).toBe(400);
     });
 
     test('responds with error msg when attempting to register a user without a first name', async () => {
-      const user = {
+      const data = {
         lastName: 'Hattori',
         email: 'ayako@email.com',
         password: '1234password5678',
       };
-      const res = await request(app).post('/register').send(user);
+      const res = await request(app).post('/register').send({ data });
       expect(res.error.text).toContain('No first name');
     });
 
     test('responds with 400 status when attempting to register a user without a last name', async () => {
-      const user = {
+      const data = {
         firstName: 'Ayako',
         email: 'ayako@email.com',
         password: '1234password5678',
       };
-      const res = await request(app).post('/register').send(user);
+      const res = await request(app).post('/register').send({ data });
       expect(res.status).toBe(400);
     });
 
     test('responds with error msg when attempting to register a user without a last name', async () => {
-      const user = {
+      const data = {
         firstName: 'Ayako',
         email: 'ayako@email.com',
         password: '1234password5678',
       };
-      const res = await request(app).post('/register').send(user);
+      const res = await request(app).post('/register').send({ data });
       expect(res.error.text).toContain('No last name');
     });
 
     test('responds with 400 status when attempting to register a user without an email', async () => {
-      const user = {
+      const data = {
         firstName: 'Ayako',
         lastName: 'Hattori',
         password: '1234password5678',
       };
-      const res = await request(app).post('/register').send(user);
+      const res = await request(app).post('/register').send({ data });
       expect(res.status).toBe(400);
     });
 
     test('responds with error msg when attempting to register a user without an email', async () => {
-      const user = {
+      const data = {
         firstName: 'Ayako',
         lastName: 'Hattori',
         password: '1234password5678',
       };
-      const res = await request(app).post('/register').send(user);
+      const res = await request(app).post('/register').send({ data });
       expect(res.error.text).toContain('No email');
     });
 
     test('responds with 400 status when attempting to register a user without a password', async () => {
-      const user = {
+      const data = {
         firstName: 'Ayako',
         lastName: 'Hattori',
         email: 'ayako@email.com',
       };
-      const res = await request(app).post('/register').send(user);
+      const res = await request(app).post('/register').send({ data });
       expect(res.status).toBe(400);
     });
 
     test('responds with error msg when attempting to register a user without a password', async () => {
-      const user = {
+      const data = {
         firstName: 'Ayako',
         lastName: 'Hattori',
         email: 'ayako@email.com',
       };
-      const res = await request(app).post('/register').send(user);
+      const res = await request(app).post('/register').send({ data });
       expect(res.error.text).toContain('No password');
     });
 
     test('responds with 400 status when attempting to register a user that already exists', async () => {
-      const user = {
+      const data = {
         firstName: 'Maggie',
         lastName: 'May',
         email: 'maggie@email.com',
         password: '1234password5678',
       };
-      await request(app).post('/register').send(user);
-      const res = await request(app).post('/register').send(user);
+      await request(app).post('/register').send({ data });
+      const res = await request(app).post('/register').send({ data });
       expect(res.status).toBe(400);
     });
 
     test('responds with error msg when attempting to register a user that already exists', async () => {
-      const user = {
+      const data = {
         firstName: 'Maggie',
         lastName: 'May',
         email: 'maggie@email.com',
         password: '1234password5678',
       };
-      await request(app).post('/register').send(user);
-      const res = await request(app).post('/register').send(user);
+      await request(app).post('/register').send({ data });
+      const res = await request(app).post('/register').send({ data });
       expect(res.error.text).toContain('User already exists');
     });
 
     test('responds with 201 status when register successful', async () => {
-      const user = {
+      const data = {
         firstName: 'Ayako',
         lastName: 'Hattori',
         email: 'ayako@email.com',
         password: '1234password5678',
       };
-      const res = await request(app).post('/register').send(user);
+      const res = await request(app).post('/register').send({ data });
       expect(res.status).toBe(201);
     });
 
     test('responds with user profile when register successful', async () => {
-      const user = {
+      const data = {
         firstName: 'Andrew',
         lastName: 'Smith',
         email: 'asmith@email.com',
         password: '1234password5678',
       };
-      const res = await request(app).post('/register').send(user);
-      expect(res.body.user.firstName).toEqual(user.firstName);
-      expect(res.body.user.lastName).toEqual(user.lastName);
-      expect(res.body.user.email).toEqual(user.email);
+      const res = await request(app).post('/register').send({ data });
+      expect(res.body.user.firstName).toEqual(data.firstName);
+      expect(res.body.user.lastName).toEqual(data.lastName);
+      expect(res.body.user.email).toEqual(data.email);
     });
   });
 
@@ -193,7 +193,7 @@ describe('Auth controllers', () => {
       const loginData = {
         email: 'me@email.com',
       };
-      const res = await request(app).post('/login').send(loginData);
+      const res = await request(app).post('/login').send({ data: loginData });
       expect(res.error.text).toContain('No password');
     });
 
@@ -201,7 +201,7 @@ describe('Auth controllers', () => {
       const loginData = {
         password: '1234password5678',
       };
-      const res = await request(app).post('/login').send(loginData);
+      const res = await request(app).post('/login').send({ data: loginData });
       expect(res.status).toBe(400);
     });
 
@@ -209,7 +209,7 @@ describe('Auth controllers', () => {
       const loginData = {
         password: '1234password5678',
       };
-      const res = await request(app).post('/login').send(loginData);
+      const res = await request(app).post('/login').send({ data: loginData });
       expect(res.error.text).toContain('No email');
     });
 
@@ -218,7 +218,7 @@ describe('Auth controllers', () => {
         email: 'me@email.com',
         password: '1234password5678',
       };
-      const res = await request(app).post('/login').send(loginData);
+      const res = await request(app).post('/login').send({ data: loginData });
       expect(res.status).toBe(400);
     });
 
@@ -227,7 +227,7 @@ describe('Auth controllers', () => {
         email: 'me@email.com',
         password: '1234password5678',
       };
-      const res = await request(app).post('/login').send(loginData);
+      const res = await request(app).post('/login').send({ data: loginData });
       expect(res.error.text).toContain('No user with that email');
     });
 
@@ -238,34 +238,37 @@ describe('Auth controllers', () => {
         email: 'billy@email.com',
         password: '1234password5678',
       };
-      await request(app).post('/register').send(registerData);
+      await request(app).post('/register').send({ data: registerData });
       const loginData = {
-        ...registerData,
+        email: registerData.email,
         password: 'thisIsIncorrect',
       };
-      const res = await request(app).post('/login').send(loginData);
+      const res = await request(app).post('/login').send({ data: loginData });
       expect(res.status).toBe(400);
     });
 
     test('responds with error msg when password is incorrect', async () => {
-      const loginData = {
-        firstName: 'Billy',
-        lastName: 'Madison',
-        email: 'billy@email.com',
-        password: 'thisIsIncorrect',
-      };
-      const res = await request(app).post('/login').send(loginData);
-      expect(res.error.text).toContain('Incorrect password');
-    });
-
-    test('responds with 200 when login is successful', async () => {
-      const loginData = {
+      const registerData = {
         firstName: 'Billy',
         lastName: 'Madison',
         email: 'billy@email.com',
         password: '1234password5678',
       };
-      const res = await request(app).post('/login').send(loginData);
+      await request(app).post('/register').send({ data: registerData });
+      const loginData = {
+        email: 'billy@email.com',
+        password: 'thisIsIncorrect',
+      };
+      const res = await request(app).post('/login').send({ data: loginData });
+      expect(res.error.text).toContain('Incorrect password');
+    });
+
+    test('responds with 200 when login is successful', async () => {
+      const loginData = {
+        email: 'billy@email.com',
+        password: '1234password5678',
+      };
+      const res = await request(app).post('/login').send({ data: loginData });
       expect(res.status).toBe(200);
     });
 
@@ -276,10 +279,14 @@ describe('Auth controllers', () => {
         email: 'billy@email.com',
         password: '1234password5678',
       };
-      const res = await request(app).post('/login').send(loginData);
-      expect(res.body.firstName).toEqual(loginData.firstName);
-      expect(res.body.lastName).toEqual(loginData.lastName);
-      expect(res.body.email).toEqual(loginData.email);
+      const res = await request(app)
+        .post('/login')
+        .send({
+          data: { email: loginData.email, password: loginData.password },
+        });
+      expect(res.body.user.firstName).toEqual(loginData.firstName);
+      expect(res.body.user.lastName).toEqual(loginData.lastName);
+      expect(res.body.user.email).toEqual(loginData.email);
     });
   });
 
