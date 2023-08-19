@@ -150,27 +150,136 @@ describe('Message routes', () => {
           content: 'Yo planet!',
         },
       });
-
     expect(res.body.message.content).toEqual('Yo planet!');
   });
 
-  test.skip('Single message route exists', async () => {
+  test('Single message route exists', async () => {
     //! This is a strange test. If you don't include a legit-looking document id in the url, a 200 status is sent, bypassing any conditional checks in the controller. In short, may need to be rewritten or perhaps not included at all.
     const res = await request(app).get('/messages/123');
     expect(res.status).not.toBe(404);
   });
 
-  // Single message route responds with 404 when message does not exist
+  test('Single message route responds with 400 when message id is wrong format', async () => {
+    const res = await request(app).get('/messages/123');
+    expect(res.status).toBe(400);
+  });
+
+  test('Single message route responds with error msg when message id is wrong format', async () => {
+    const res = await request(app).get('/messages/123');
+    expect(res.error.text).toContain('Message id is wrong format');
+  });
+
   test('Single message route responds with 404 when message does not exist', async () => {
     const res = await request(app).get('/messages/615a8be41c2b20f6e47c256d');
     expect(res.status).toBe(404);
   });
 
-  // Single message route responds with 200 when message exists
-  test.skip('Single message route responds with 200 when message exists', async () => {});
-  // Single message route responds with message when it exists
-  test.skip('Single message route responds with message when it exists', async () => {});
+  test('Single message route responds with error msg when message does not exist', async () => {
+    const res = await request(app).get('/messages/615a8be41c2b20f6e47c256d');
+    expect(res.error.text).toContain('No message found with id');
+  });
 
-  // New message route responds with parentId when submitted with one
-  test.skip('New message route responds with parentId when submitted with one', async () => {});
+  test('Single message route responds with 200 when message exists', async () => {
+    const userRes = await request(app)
+      .post('/login')
+      .send({
+        data: {
+          email: 'maggie@email.com',
+          password: '1234password5678',
+        },
+      });
+    const msgRes = await request(app)
+      .post('/messages/new')
+      .send({
+        data: {
+          author: userRes.body.user._id,
+          content: 'I am ALIVE!!!',
+        },
+      });
+    const res = await request(app).get(`/messages/${msgRes.body.message._id}`);
+    expect(res.status).toBe(200);
+  });
+
+  test('Single message route responds with message when it exists', async () => {
+    const userRes = await request(app)
+      .post('/login')
+      .send({
+        data: {
+          email: 'maggie@email.com',
+          password: '1234password5678',
+        },
+      });
+    const msgRes = await request(app)
+      .post('/messages/new')
+      .send({
+        data: {
+          author: userRes.body.user._id,
+          content: 'Where am I?',
+        },
+      });
+    const res = await request(app).get(`/messages/${msgRes.body.message._id}`);
+    expect(res.body.message).toBeTruthy();
+  });
+
+  test('New message route responds with parentId when submitted with one', async () => {
+    const userRes1 = await request(app)
+      .post('/register')
+      .send({
+        data: {
+          firstName: 'User',
+          lastName: 'One',
+          email: 'user1@email.com',
+          password: '1234password5678',
+        },
+      });
+    const userRes2 = await request(app)
+      .post('/register')
+      .send({
+        data: {
+          firstName: 'User',
+          lastName: 'Two',
+          email: 'user2@email.com',
+          password: '1234password5678',
+        },
+      });
+    const msgRes1 = await request(app)
+      .post('/messages/new')
+      .send({
+        data: {
+          author: userRes1.body.user._id,
+          content: 'Hello? Is there anybody in there?',
+        },
+      });
+    const msgRes2 = await request(app)
+      .post('/messages/new')
+      .send({
+        data: {
+          author: userRes2.body.user._id,
+          content: 'Just nod if you can hear me...',
+          parentId: msgRes1.body.message._id,
+        },
+      });
+    expect(msgRes2.body.message.parentId).toBe(msgRes1.body.message._id);
+  });
+
+  test('New message route responds without parentId when submitted without one', async () => {
+    const userRes = await request(app)
+      .post('/login')
+      .send({
+        data: {
+          email: 'maggie@email.com',
+          password: '1234password5678',
+        },
+      });
+    const msgRes = await request(app)
+      .post('/messages/new')
+      .send({
+        data: {
+          author: userRes.body.user._id,
+          content: 'Where am I?',
+        },
+      });
+    const res = await request(app).get(`/messages/${msgRes.body.message._id}`);
+    expect(res.body.message.parentId).toBeNull();
+  });
 });
