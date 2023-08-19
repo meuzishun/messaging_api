@@ -45,48 +45,76 @@ describe('Message routes', () => {
   });
 
   test('New message route responds with 400 status when no content is included', async () => {
-    const userRes = await request(app).post('/register').send({
-      firstName: 'Maggie',
-      lastName: 'May',
-      email: 'maggie@email.com',
-      password: '1234password5678',
-    });
-    const res = await request(app).post('/messages/new').send({
-      author: userRes.body.user._id,
-    });
+    const userRes = await request(app)
+      .post('/register')
+      .send({
+        data: {
+          firstName: 'Maggie',
+          lastName: 'May',
+          email: 'maggie@email.com',
+          password: '1234password5678',
+        },
+      });
+    const res = await request(app)
+      .post('/messages/new')
+      .send({
+        data: {
+          author: userRes.body.user._id,
+        },
+      });
     expect(res.status).toBe(400);
   });
 
   test('New message route responds with error msg when no content is included', async () => {
-    const userRes = await request(app).post('/login').send({
-      email: 'maggie@email.com',
-      password: '1234password5678',
-    });
-    const res = await request(app).post('/messages/new').send({
-      author: userRes.body._id,
-    });
+    const userRes = await request(app)
+      .post('/login')
+      .send({
+        data: {
+          email: 'maggie@email.com',
+          password: '1234password5678',
+        },
+      });
+    const res = await request(app)
+      .post('/messages/new')
+      .send({
+        data: {
+          author: userRes.body._id,
+        },
+      });
     expect(res.error.text).toContain('No message content submitted');
   });
 
   test('New message route responds with 400 status when user id is not included', async () => {
-    const res = await request(app).post('/messages/new').send({
-      content: 'Hello world',
-    });
+    const res = await request(app)
+      .post('/messages/new')
+      .send({
+        data: {
+          content: 'Hello world',
+        },
+      });
     expect(res.status).toBe(400);
   });
 
   test('New message route responds with error msg when user id is not included', async () => {
-    const res = await request(app).post('/messages/new').send({
-      content: 'Hello world',
-    });
+    const res = await request(app)
+      .post('/messages/new')
+      .send({
+        data: {
+          content: 'Hello world',
+        },
+      });
     expect(res.error.text).toContain('No author submitted');
   });
 
   test('New message route responds with 201 status when new message submission is successful', async () => {
-    const userRes = await request(app).post('/login').send({
-      email: 'maggie@email.com',
-      password: '1234password5678',
-    });
+    const userRes = await request(app)
+      .post('/login')
+      .send({
+        data: {
+          email: 'maggie@email.com',
+          password: '1234password5678',
+        },
+      });
     //* Only for isolating this test:
     // const userRes = await request(app).post('/register').send({
     //   firstName: 'Maggie',
@@ -94,22 +122,34 @@ describe('Message routes', () => {
     //   email: 'maggie@email.com',
     //   password: '1234password5678',
     // });
-    const res = await request(app).post('/messages/new').send({
-      author: userRes.body._id,
-      content: 'Hello world',
-    });
+    const res = await request(app)
+      .post('/messages/new')
+      .send({
+        data: {
+          author: userRes.body.user._id,
+          content: 'Hello world',
+        },
+      });
     expect(res.status).toBe(201);
   });
 
   test('New message route responds with message when new message submission is successful', async () => {
-    const userRes = await request(app).post('/login').send({
-      email: 'maggie@email.com',
-      password: '1234password5678',
-    });
-    const res = await request(app).post('/messages/new').send({
-      author: userRes.body._id,
-      content: 'Yo planet!',
-    });
+    const userRes = await request(app)
+      .post('/login')
+      .send({
+        data: {
+          email: 'maggie@email.com',
+          password: '1234password5678',
+        },
+      });
+    const res = await request(app)
+      .post('/messages/new')
+      .send({
+        data: {
+          author: userRes.body.user._id,
+          content: 'Yo planet!',
+        },
+      });
 
     expect(res.body.message.content).toEqual('Yo planet!');
   });
