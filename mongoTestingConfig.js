@@ -16,13 +16,13 @@ const initializeMongoServer = async () => {
   });
 
   mongoose.connection.once('open', () => {
-    console.log(`Mocked MongoDB successfully connected to ${mongoURI}`);
+    // console.log(`Mocked MongoDB successfully connected to ${mongoURI}`);
   });
 };
 
 const disconnectMongoServer = async () => {
   mongoose.connection.on('disconnected', () => {
-    console.log('Mocked MongoDB successfully disconnected');
+    // console.log('Mocked MongoDB successfully disconnected');
   });
   await mongoose.disconnect();
 };
