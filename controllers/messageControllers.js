@@ -4,8 +4,38 @@ const mongoose = require('mongoose');
 const ObjectId = mongoose.Types.ObjectId;
 
 const getMessages = asyncHandler(async (req, res) => {
-  const messages = await Message.find({});
-  return res.status(200).json({ messages });
+  const heads = await Message.find({
+    participants: { $in: req.body.user._id },
+    parentId: null,
+  })
+    .populate('author')
+    .populate('participants');
+
+  const threads = heads.map((head) => [head]);
+
+  for (let i = 0; i < threads.length; i++) {
+    let searching = true;
+
+    while (searching) {
+      let lastMessage = threads[i].at(-1);
+
+      let message = await Message.findOne({
+        parentId: lastMessage._id,
+      })
+        .populate('author')
+        .populate('participants');
+
+      if (message) {
+        threads[i].push(message);
+      }
+
+      if (!message) {
+        searching = false;
+      }
+    }
+  }
+
+  return res.status(200).json({ messages: threads });
 });
 
 const getMessage = asyncHandler(async (req, res) => {
