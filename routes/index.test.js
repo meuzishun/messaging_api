@@ -163,6 +163,17 @@ describe('Auth controllers', () => {
       expect(res.body.user.lastName).toEqual(data.lastName);
       expect(res.body.user.email).toEqual(data.email);
     });
+
+    test('responds with token when register successful', async () => {
+      const data = {
+        firstName: 'First',
+        lastName: 'User',
+        email: 'user1@email.com',
+        password: '1234password5678',
+      };
+      const res = await request(app).post('/register').send({ data });
+      expect(res.body.token).toBeTruthy();
+    });
   });
 
   describe('Login route', () => {
@@ -288,6 +299,8 @@ describe('Auth controllers', () => {
       expect(res.body.user.lastName).toEqual(loginData.lastName);
       expect(res.body.user.email).toEqual(loginData.email);
     });
+
+    // TODO: responds with token when login is successful
   });
 
   describe('Contacts route', () => {
