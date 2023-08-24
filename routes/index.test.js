@@ -300,7 +300,20 @@ describe('Auth controllers', () => {
       expect(res.body.user.email).toEqual(loginData.email);
     });
 
-    // TODO: responds with token when login is successful
+    test('responds with token when login is successful', async () => {
+      const loginData = {
+        firstName: 'Billy',
+        lastName: 'Madison',
+        email: 'billy@email.com',
+        password: '1234password5678',
+      };
+      const res = await request(app)
+        .post('/login')
+        .send({
+          data: { email: loginData.email, password: loginData.password },
+        });
+      expect(res.body.token).toBeTruthy();
+    });
   });
 
   describe('Contacts route', () => {
