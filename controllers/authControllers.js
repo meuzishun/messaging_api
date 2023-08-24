@@ -1,5 +1,11 @@
+const fs = require('fs');
+const path = require('path');
 const asyncHandler = require('express-async-handler');
+const jwt = require('jsonwebtoken');
 const User = require('../models/user');
+
+const pathToKey = path.join(__dirname, '..', '/config/id_rsa_priv.pem');
+const PRIV_KEY = fs.readFileSync(pathToKey, 'utf8');
 
 const postRegister = asyncHandler(async (req, res) => {
   if (!req.body.data) {
@@ -37,7 +43,13 @@ const postRegister = asyncHandler(async (req, res) => {
   }
 
   const user = await User.create(req.body.data);
-  return res.status(201).json({ user });
+
+  const token = jwt.sign({ id: user._id }, PRIV_KEY, {
+    expiresIn: '10d',
+    algorithm: 'RS256',
+  });
+
+  return res.status(201).json({ user, token });
 });
 
 const postLogin = asyncHandler(async (req, res) => {
@@ -69,7 +81,12 @@ const postLogin = asyncHandler(async (req, res) => {
     throw new Error('Incorrect password');
   }
 
-  return res.status(200).json({ user });
+  const token = jwt.sign({ id: user._id }, PRIV_KEY, {
+    expiresIn: '10d',
+    algorithm: 'RS256',
+  });
+
+  return res.status(200).json({ user, token });
 });
 
 module.exports = {
