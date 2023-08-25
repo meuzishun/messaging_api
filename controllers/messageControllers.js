@@ -40,6 +40,7 @@ const getMessages = asyncHandler(async (req, res) => {
 
 const getMessage = asyncHandler(async (req, res) => {
   const { messageId } = req.params;
+  const user = req.body.user;
 
   if (!ObjectId.isValid(messageId)) {
     res.status(400);
@@ -53,6 +54,11 @@ const getMessage = asyncHandler(async (req, res) => {
     throw new Error('No message found with id');
   }
 
+  if (message.author.toString() !== user._id.toString()) {
+    res.status(401);
+    throw new Error('Not authorized, message not authored by user');
+  }
+
   return res.status(200).json({ message });
 });
 
@@ -62,20 +68,21 @@ const postNewMessage = asyncHandler(async (req, res) => {
     throw new Error('No message submitted');
   }
 
-  const { content, author } = req.body.data;
+  const { data, user } = req.body;
 
-  if (!content) {
+  if (!data) {
     res.status(400);
     throw new Error('No message content submitted');
   }
 
-  if (!author) {
+  if (!user) {
     res.status(400);
     throw new Error('No author submitted');
   }
 
   const message = await Message.create({
     ...req.body.data,
+    author: user._id,
     timestamp: new Date(),
   });
 
