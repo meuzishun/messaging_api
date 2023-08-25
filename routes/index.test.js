@@ -242,7 +242,7 @@ describe('Auth controllers', () => {
       expect(res.error.text).toContain('No user with that email');
     });
 
-    test('responds with 400 error when password is incorrect', async () => {
+    test('responds with 401 error when password is incorrect', async () => {
       const registerData = {
         firstName: 'Billy',
         lastName: 'Madison',
@@ -255,7 +255,7 @@ describe('Auth controllers', () => {
         password: 'thisIsIncorrect',
       };
       const res = await request(app).post('/login').send({ data: loginData });
-      expect(res.status).toBe(400);
+      expect(res.status).toBe(401);
     });
 
     test('responds with error msg when password is incorrect', async () => {
