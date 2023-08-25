@@ -77,7 +77,7 @@ const postLogin = asyncHandler(async (req, res) => {
   }
 
   if (user.password !== password) {
-    res.status(400);
+    res.status(401);
     throw new Error('Incorrect password');
   }
 
