@@ -1,11 +1,19 @@
 const asyncHandler = require('express-async-handler');
 const Message = require('../models/message');
+const User = require('../models/user');
 const mongoose = require('mongoose');
 const ObjectId = mongoose.Types.ObjectId;
 
 const getMessages = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.body.user._id);
+
+  if (!user) {
+    res.status(400);
+    throw new Error('No user found');
+  }
+
   const heads = await Message.find({
-    participants: { $in: req.body.user._id },
+    participants: { $in: user._id },
     parentId: null,
   })
     .populate('author')
@@ -39,8 +47,14 @@ const getMessages = asyncHandler(async (req, res) => {
 });
 
 const getMessage = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.body.user._id);
+
+  if (!user) {
+    res.status(400);
+    throw new Error('No user found');
+  }
+
   const { messageId } = req.params;
-  const user = req.body.user;
 
   if (!ObjectId.isValid(messageId)) {
     res.status(400);
@@ -63,21 +77,18 @@ const getMessage = asyncHandler(async (req, res) => {
 });
 
 const postNewMessage = asyncHandler(async (req, res) => {
-  if (!req.body.data) {
-    res.status(400);
-    throw new Error('No message submitted');
-  }
-
-  const { data, user } = req.body;
-
-  if (!data) {
-    res.status(400);
-    throw new Error('No message content submitted');
-  }
+  const user = await User.findById(req.body.user._id);
 
   if (!user) {
     res.status(400);
     throw new Error('No author submitted');
+  }
+
+  const data = req.body.data;
+
+  if (!data) {
+    res.status(400);
+    throw new Error('No message submitted');
   }
 
   const message = await Message.create({
