@@ -3,6 +3,7 @@ const path = require('path');
 const asyncHandler = require('express-async-handler');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
+const bcrypt = require('bcryptjs');
 
 const pathToKey = path.join(__dirname, '..', '/config/id_rsa_priv.pem');
 const PRIV_KEY = fs.readFileSync(pathToKey, 'utf8');
@@ -42,7 +43,15 @@ const postRegister = asyncHandler(async (req, res) => {
     throw new Error('User already exists');
   }
 
-  const user = await User.create(req.body.data);
+  const salt = await bcrypt.genSalt(10);
+  const hashedPassword = await bcrypt.hash(password, salt);
+
+  const user = await User.create({
+    firstName,
+    lastName,
+    email,
+    password: hashedPassword,
+  });
 
   const token = jwt.sign({ id: user._id }, PRIV_KEY, {
     expiresIn: '10d',
@@ -76,7 +85,9 @@ const postLogin = asyncHandler(async (req, res) => {
     throw new Error('No user with that email');
   }
 
-  if (user.password !== password) {
+  const validPassword = await bcrypt.compare(password, user.password);
+
+  if (!validPassword) {
     res.status(401);
     throw new Error('Incorrect password');
   }
