@@ -4,6 +4,9 @@ const User = require('../models/user');
 const mongoose = require('mongoose');
 const ObjectId = mongoose.Types.ObjectId;
 
+// @desc    Get messages
+// @route   GET /messages
+// @access  Private
 const getMessages = asyncHandler(async (req, res) => {
   const user = await User.findById(req.body.user._id);
 
@@ -46,6 +49,9 @@ const getMessages = asyncHandler(async (req, res) => {
   return res.status(200).json({ messages: threads });
 });
 
+// @desc    Get a single message
+// @route   GET /message/:messageId
+// @access  Private
 const getMessage = asyncHandler(async (req, res) => {
   const user = await User.findById(req.body.user._id);
 
@@ -76,7 +82,10 @@ const getMessage = asyncHandler(async (req, res) => {
   return res.status(200).json({ message });
 });
 
-const postNewMessage = asyncHandler(async (req, res) => {
+// @desc    Post messages
+// @route   POST /messages/new
+// @access  Private
+const createMessage = asyncHandler(async (req, res) => {
   const user = await User.findById(req.body.user._id);
 
   if (!user) {
@@ -103,5 +112,5 @@ const postNewMessage = asyncHandler(async (req, res) => {
 module.exports = {
   getMessages,
   getMessage,
-  postNewMessage,
+  createMessage,
 };

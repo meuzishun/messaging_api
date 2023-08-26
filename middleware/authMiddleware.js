@@ -7,7 +7,7 @@ const User = require('../models/user');
 const pathToKey = path.join(__dirname, '..', '/config/id_rsa_priv.pem');
 const PRIV_KEY = fs.readFileSync(pathToKey, 'utf8');
 
-const authMiddleware = asyncHandler(async (req, res, next) => {
+const authHandler = asyncHandler(async (req, res, next) => {
   if (
     !req.headers.authorization ||
     !req.headers.authorization.startsWith('Bearer')
@@ -29,4 +29,4 @@ const authMiddleware = asyncHandler(async (req, res, next) => {
   next();
 });
 
-module.exports = authMiddleware;
+module.exports = authHandler;

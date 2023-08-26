@@ -8,7 +8,10 @@ const bcrypt = require('bcryptjs');
 const pathToKey = path.join(__dirname, '..', '/config/id_rsa_priv.pem');
 const PRIV_KEY = fs.readFileSync(pathToKey, 'utf8');
 
-const postRegister = asyncHandler(async (req, res) => {
+// @desc    Register user
+// @route   POST /register
+// @access  Public
+const registerUser = asyncHandler(async (req, res) => {
   if (!req.body.data) {
     res.status(400);
     throw new Error('No user data submitted');
@@ -61,7 +64,10 @@ const postRegister = asyncHandler(async (req, res) => {
   return res.status(201).json({ user, token });
 });
 
-const postLogin = asyncHandler(async (req, res) => {
+// @desc    Login user
+// @route   POST /login
+// @access  Public
+const loginUser = asyncHandler(async (req, res) => {
   if (!req.body.data) {
     res.status(400);
     throw new Error('No user submitted');
@@ -101,6 +107,6 @@ const postLogin = asyncHandler(async (req, res) => {
 });
 
 module.exports = {
-  postRegister,
-  postLogin,
+  registerUser,
+  loginUser,
 };

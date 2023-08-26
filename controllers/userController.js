@@ -6,12 +6,12 @@ const getProfile = (req, res) => {
   res.send('Profile GET route');
 };
 
-const postProfileEdit = (req, res) => {
+const editProfile = (req, res) => {
   res.send('Edit profile POST route');
 };
 
 module.exports = {
   getContacts,
   getProfile,
-  postProfileEdit,
+  editProfile,
 };

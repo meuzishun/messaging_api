@@ -6,7 +6,7 @@ const helmet = require('helmet');
 const RateLimit = require('express-rate-limit');
 const genKeyPair = require('./lib/generateKeyPair');
 const routes = require('./routes/index');
-const { errorHandler } = require('./middleware/errorHandler');
+const errorHandler = require('./middleware/errorMiddleware');
 
 const limiter = RateLimit({
   windowMs: 1 * 60 * 1000,
