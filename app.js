@@ -13,11 +13,7 @@ const limiter = RateLimit({
   max: 20,
 });
 
-const whitelist = [
-  'https://meuzishun.github.io/blog-client-author',
-  'https://meuzishun.github.io/blog-client',
-  'https://meuzishun.github.io',
-];
+const whitelist = ['https://meuzishun.github.io'];
 
 const corsOptions = {
   origin: function (origin, callback) {
