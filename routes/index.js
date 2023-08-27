@@ -1,12 +1,11 @@
 const messagesRoutes = require('./messages');
-
-const { registerUser, loginUser } = require('../controllers/authController');
 const {
+  registerUser,
+  loginUser,
   getContacts,
   getProfile,
   editProfile,
 } = require('../controllers/userController');
-
 const router = require('express').Router();
 
 router.use('/messages', messagesRoutes);
