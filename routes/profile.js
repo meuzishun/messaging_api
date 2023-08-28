@@ -1,7 +1,12 @@
 const router = require('express').Router();
-const { getProfile, editProfile } = require('../controllers/profileController');
+const {
+  getProfile,
+  editProfile,
+  deleteProfile,
+} = require('../controllers/profileController');
 
 router.get('/', getProfile);
-router.post('/edit', editProfile);
+router.put('/edit', editProfile);
+router.delete('/', deleteProfile);
 
 module.exports = router;
