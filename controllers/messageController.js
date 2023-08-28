@@ -109,8 +109,84 @@ const createMessage = asyncHandler(async (req, res) => {
   return res.status(201).json({ message });
 });
 
+// @desc    Edit message
+// @route   PUT /messages/:messageId/edit
+// @access  Private
+const editMessage = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.body.user._id);
+
+  if (!user) {
+    res.status(401);
+    throw new Error('No author submitted');
+  }
+
+  const message = await Message.findById(req.params.messageId);
+
+  if (!message) {
+    res.status(404);
+    throw new Error('Message not found');
+  }
+
+  if (user._id.toString() !== message.author.toString()) {
+    res.status(400);
+    throw new Error(
+      'Cannot alter message when author and user ids do not match'
+    );
+  }
+
+  const newData = req.body.data;
+
+  if (!newData) {
+    res.status(400);
+    throw new Error('No message data sent');
+  }
+
+  const newMessage = await Message.findByIdAndUpdate(
+    req.params.messageId,
+    {
+      content: newData.content,
+      timestamp: new Date(),
+    },
+    { returnDocument: 'after' }
+  );
+
+  res.status(201).json({ message: newMessage });
+});
+
+// @desc    Delete message
+// @route   DELETE /messages/:messageId
+// @access  Private
+const deleteMessage = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.body.user._id);
+
+  if (!user) {
+    res.status(401);
+    throw new Error('No user found');
+  }
+
+  const message = await Message.findById(req.params.messageId);
+
+  if (!message) {
+    res.status(404);
+    throw new Error('No message found');
+  }
+
+  if (user._id.toString() !== message.author.toString()) {
+    res.status(400);
+    throw new Error(
+      'Cannot delete message when author and user ids do not match'
+    );
+  }
+
+  const deletedMsgId = await Message.findByIdAndDelete(req.params.messageId);
+
+  res.status(200).json({ id: message._id });
+});
+
 module.exports = {
   getMessages,
   getMessage,
   createMessage,
+  editMessage,
+  deleteMessage,
 };
