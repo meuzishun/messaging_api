@@ -1,16 +1,14 @@
+const authRoutes = require('./auth');
 const messagesRoutes = require('./messages');
 const {
-  registerUser,
-  loginUser,
   getContacts,
   getProfile,
   editProfile,
 } = require('../controllers/userController');
 const router = require('express').Router();
 
+router.use('/auth', authRoutes);
 router.use('/messages', messagesRoutes);
-router.post('/register', registerUser);
-router.post('/login', loginUser);
 router.get('/contacts', getContacts);
 router.get('/profile', getProfile);
 router.post('/profile/edit', editProfile);

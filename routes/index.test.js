@@ -1,6 +1,5 @@
 const app = require('../app');
 const request = require('supertest');
-const User = require('../models/user');
 const {
   initializeMongoServer,
   disconnectMongoServer,
@@ -17,22 +16,22 @@ describe('Auth controllers', () => {
 
   describe('Register route', () => {
     test('Register route exists', async () => {
-      const res = await request(app).post('/register');
+      const res = await request(app).post('/api/auth/register');
       expect(res.status).not.toBe(404);
     });
 
     test('responds with json no matter what', async () => {
-      const res = await request(app).post('/register');
+      const res = await request(app).post('/api/auth/register');
       expect(res.headers['content-type']).toMatch(/json/);
     });
 
     test('responds with 400 status when user not sent with body', async () => {
-      const res = await request(app).post('/register');
+      const res = await request(app).post('/api/auth/register');
       expect(res.status).toBe(400);
     });
 
     test('responds with error msg when user not sent with body', async () => {
-      const res = await request(app).post('/register');
+      const res = await request(app).post('/api/auth/register');
       expect(res.error.text).toContain('No user data submitted');
     });
 
@@ -42,7 +41,7 @@ describe('Auth controllers', () => {
         email: 'ayako@email.com',
         password: '1234password5678',
       };
-      const res = await request(app).post('/register').send({ data });
+      const res = await request(app).post('/api/auth/register').send({ data });
       expect(res.status).toBe(400);
     });
 
@@ -52,7 +51,7 @@ describe('Auth controllers', () => {
         email: 'ayako@email.com',
         password: '1234password5678',
       };
-      const res = await request(app).post('/register').send({ data });
+      const res = await request(app).post('/api/auth/register').send({ data });
       expect(res.error.text).toContain('No first name');
     });
 
@@ -62,7 +61,7 @@ describe('Auth controllers', () => {
         email: 'ayako@email.com',
         password: '1234password5678',
       };
-      const res = await request(app).post('/register').send({ data });
+      const res = await request(app).post('/api/auth/register').send({ data });
       expect(res.status).toBe(400);
     });
 
@@ -72,7 +71,7 @@ describe('Auth controllers', () => {
         email: 'ayako@email.com',
         password: '1234password5678',
       };
-      const res = await request(app).post('/register').send({ data });
+      const res = await request(app).post('/api/auth/register').send({ data });
       expect(res.error.text).toContain('No last name');
     });
 
@@ -82,7 +81,7 @@ describe('Auth controllers', () => {
         lastName: 'Hattori',
         password: '1234password5678',
       };
-      const res = await request(app).post('/register').send({ data });
+      const res = await request(app).post('/api/auth/register').send({ data });
       expect(res.status).toBe(400);
     });
 
@@ -92,7 +91,7 @@ describe('Auth controllers', () => {
         lastName: 'Hattori',
         password: '1234password5678',
       };
-      const res = await request(app).post('/register').send({ data });
+      const res = await request(app).post('/api/auth/register').send({ data });
       expect(res.error.text).toContain('No email');
     });
 
@@ -102,7 +101,7 @@ describe('Auth controllers', () => {
         lastName: 'Hattori',
         email: 'ayako@email.com',
       };
-      const res = await request(app).post('/register').send({ data });
+      const res = await request(app).post('/api/auth/register').send({ data });
       expect(res.status).toBe(400);
     });
 
@@ -112,7 +111,7 @@ describe('Auth controllers', () => {
         lastName: 'Hattori',
         email: 'ayako@email.com',
       };
-      const res = await request(app).post('/register').send({ data });
+      const res = await request(app).post('/api/auth/register').send({ data });
       expect(res.error.text).toContain('No password');
     });
 
@@ -123,8 +122,9 @@ describe('Auth controllers', () => {
         email: 'maggie@email.com',
         password: '1234password5678',
       };
-      await request(app).post('/register').send({ data });
-      const res = await request(app).post('/register').send({ data });
+      await request(app).post('/api/auth/register').send({ data });
+      const res = await request(app).post('/api/auth/register').send({ data });
+      console.log(res.body);
       expect(res.status).toBe(400);
     });
 
@@ -135,8 +135,8 @@ describe('Auth controllers', () => {
         email: 'maggie@email.com',
         password: '1234password5678',
       };
-      await request(app).post('/register').send({ data });
-      const res = await request(app).post('/register').send({ data });
+      await request(app).post('/api/auth/register').send({ data });
+      const res = await request(app).post('/api/auth/register').send({ data });
       expect(res.error.text).toContain('User already exists');
     });
 
@@ -147,7 +147,7 @@ describe('Auth controllers', () => {
         email: 'ayako@email.com',
         password: '1234password5678',
       };
-      const res = await request(app).post('/register').send({ data });
+      const res = await request(app).post('/api/auth/register').send({ data });
       expect(res.status).toBe(201);
     });
 
@@ -158,7 +158,7 @@ describe('Auth controllers', () => {
         email: 'asmith@email.com',
         password: '1234password5678',
       };
-      const res = await request(app).post('/register').send({ data });
+      const res = await request(app).post('/api/auth/register').send({ data });
       expect(res.body.user.firstName).toEqual(data.firstName);
       expect(res.body.user.lastName).toEqual(data.lastName);
       expect(res.body.user.email).toEqual(data.email);
@@ -171,24 +171,24 @@ describe('Auth controllers', () => {
         email: 'user1@email.com',
         password: '1234password5678',
       };
-      const res = await request(app).post('/register').send({ data });
+      const res = await request(app).post('/api/auth/register').send({ data });
       expect(res.body.token).toBeTruthy();
     });
   });
 
   describe('Login route', () => {
     test('Login route exists', async () => {
-      const res = await request(app).post('/login');
+      const res = await request(app).post('/api/auth/login');
       expect(res.status).not.toBe(404);
     });
 
     test('responds with 400 error when nothing is submitted', async () => {
-      const res = await request(app).post('/login');
+      const res = await request(app).post('/api/auth/login');
       expect(res.status).toBe(400);
     });
 
     test('responds with error msg when nothing is submitted', async () => {
-      const res = await request(app).post('/login');
+      const res = await request(app).post('/api/auth/login');
       expect(res.error.text).toContain('No user submitted');
     });
 
@@ -196,7 +196,7 @@ describe('Auth controllers', () => {
       const loginData = {
         email: 'me@email.com',
       };
-      const res = await request(app).post('/login').send(loginData);
+      const res = await request(app).post('/api/auth/login').send(loginData);
       expect(res.status).toBe(400);
     });
 
@@ -204,7 +204,9 @@ describe('Auth controllers', () => {
       const loginData = {
         email: 'me@email.com',
       };
-      const res = await request(app).post('/login').send({ data: loginData });
+      const res = await request(app)
+        .post('/api/auth/login')
+        .send({ data: loginData });
       expect(res.error.text).toContain('No password');
     });
 
@@ -212,7 +214,9 @@ describe('Auth controllers', () => {
       const loginData = {
         password: '1234password5678',
       };
-      const res = await request(app).post('/login').send({ data: loginData });
+      const res = await request(app)
+        .post('/api/auth/login')
+        .send({ data: loginData });
       expect(res.status).toBe(400);
     });
 
@@ -220,7 +224,9 @@ describe('Auth controllers', () => {
       const loginData = {
         password: '1234password5678',
       };
-      const res = await request(app).post('/login').send({ data: loginData });
+      const res = await request(app)
+        .post('/api/auth/login')
+        .send({ data: loginData });
       expect(res.error.text).toContain('No email');
     });
 
@@ -229,7 +235,9 @@ describe('Auth controllers', () => {
         email: 'me@email.com',
         password: '1234password5678',
       };
-      const res = await request(app).post('/login').send({ data: loginData });
+      const res = await request(app)
+        .post('/api/auth/login')
+        .send({ data: loginData });
       expect(res.status).toBe(400);
     });
 
@@ -238,7 +246,9 @@ describe('Auth controllers', () => {
         email: 'me@email.com',
         password: '1234password5678',
       };
-      const res = await request(app).post('/login').send({ data: loginData });
+      const res = await request(app)
+        .post('/api/auth/login')
+        .send({ data: loginData });
       expect(res.error.text).toContain('No user with that email');
     });
 
@@ -249,12 +259,16 @@ describe('Auth controllers', () => {
         email: 'billy@email.com',
         password: '1234password5678',
       };
-      await request(app).post('/register').send({ data: registerData });
+      await request(app)
+        .post('/api/auth/register')
+        .send({ data: registerData });
       const loginData = {
         email: registerData.email,
         password: 'thisIsIncorrect',
       };
-      const res = await request(app).post('/login').send({ data: loginData });
+      const res = await request(app)
+        .post('/api/auth/login')
+        .send({ data: loginData });
       expect(res.status).toBe(401);
     });
 
@@ -265,12 +279,16 @@ describe('Auth controllers', () => {
         email: 'billy@email.com',
         password: '1234password5678',
       };
-      await request(app).post('/register').send({ data: registerData });
+      await request(app)
+        .post('/api/auth/register')
+        .send({ data: registerData });
       const loginData = {
         email: 'billy@email.com',
         password: 'thisIsIncorrect',
       };
-      const res = await request(app).post('/login').send({ data: loginData });
+      const res = await request(app)
+        .post('/api/auth/login')
+        .send({ data: loginData });
       expect(res.error.text).toContain('Incorrect password');
     });
 
@@ -279,7 +297,9 @@ describe('Auth controllers', () => {
         email: 'billy@email.com',
         password: '1234password5678',
       };
-      const res = await request(app).post('/login').send({ data: loginData });
+      const res = await request(app)
+        .post('/api/auth/login')
+        .send({ data: loginData });
       expect(res.status).toBe(200);
     });
 
@@ -291,7 +311,7 @@ describe('Auth controllers', () => {
         password: '1234password5678',
       };
       const res = await request(app)
-        .post('/login')
+        .post('/api/auth/login')
         .send({
           data: { email: loginData.email, password: loginData.password },
         });
@@ -308,7 +328,7 @@ describe('Auth controllers', () => {
         password: '1234password5678',
       };
       const res = await request(app)
-        .post('/login')
+        .post('/api/auth/login')
         .send({
           data: { email: loginData.email, password: loginData.password },
         });
@@ -318,21 +338,21 @@ describe('Auth controllers', () => {
 
   describe('Contacts route', () => {
     test('Contacts route exists', async () => {
-      const res = await request(app).get('/contacts');
+      const res = await request(app).get('/api/contacts');
       expect(res.status).not.toBe(404);
     });
   });
 
   describe('Profile route', () => {
     test('Profile route exists', async () => {
-      const res = await request(app).get('/profile');
+      const res = await request(app).get('/api/profile');
       expect(res.status).not.toBe(404);
     });
   });
 
   describe('Profile/edit route', () => {
     test('Profile/edit route exists', async () => {
-      const res = await request(app).post('/profile/edit');
+      const res = await request(app).post('/api/profile/edit');
       expect(res.status).not.toBe(404);
     });
   });

@@ -37,7 +37,7 @@ if (process.env.NODE_ENV === 'Production') {
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use('/', routes);
+app.use('/api', routes);
 app.use(errorHandler);
 
 module.exports = app;

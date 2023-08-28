@@ -24,7 +24,7 @@ describe('Message routes', () => {
 
     // Register a bunch of users
     await request(app)
-      .post('/register')
+      .post('/api/auth/register')
       .send({
         data: {
           firstName: 'Debbie',
@@ -35,7 +35,7 @@ describe('Message routes', () => {
       });
 
     await request(app)
-      .post('/register')
+      .post('/api/auth/register')
       .send({
         data: {
           firstName: 'Maggie',
@@ -46,7 +46,7 @@ describe('Message routes', () => {
       });
 
     await request(app)
-      .post('/register')
+      .post('/api/auth/register')
       .send({
         data: {
           firstName: 'User',
@@ -57,7 +57,7 @@ describe('Message routes', () => {
       });
 
     await request(app)
-      .post('/register')
+      .post('/api/auth/register')
       .send({
         data: {
           firstName: 'Second',
@@ -68,7 +68,7 @@ describe('Message routes', () => {
       });
 
     await request(app)
-      .post('/register')
+      .post('/api/auth/register')
       .send({
         data: {
           firstName: 'Third',
@@ -79,7 +79,7 @@ describe('Message routes', () => {
       });
 
     await request(app)
-      .post('/register')
+      .post('/api/auth/register')
       .send({
         data: {
           firstName: 'Fourth',
@@ -91,7 +91,7 @@ describe('Message routes', () => {
 
     // Login users
     const debbieUserRes = await request(app)
-      .post('/login')
+      .post('/api/auth/login')
       .send({
         data: {
           email: 'deb@email.com',
@@ -103,7 +103,7 @@ describe('Message routes', () => {
     debbieToken = debbieUserRes.body.token;
 
     const maggieUserRes = await request(app)
-      .post('/login')
+      .post('/api/auth/login')
       .send({
         data: {
           email: 'maggie@email.com',
@@ -115,7 +115,7 @@ describe('Message routes', () => {
     maggieToken = maggieUserRes.body.token;
 
     const user1Res = await request(app)
-      .post('/login')
+      .post('/api/auth/login')
       .send({
         data: {
           email: 'user1@email.com',
@@ -127,7 +127,7 @@ describe('Message routes', () => {
     user1Token = user1Res.body.token;
 
     const user2Res = await request(app)
-      .post('/login')
+      .post('/api/auth/login')
       .send({
         data: {
           email: 'user2@email.com',
@@ -139,7 +139,7 @@ describe('Message routes', () => {
     user2Token = user2Res.body.token;
 
     const user3Res = await request(app)
-      .post('/login')
+      .post('/api/auth/login')
       .send({
         data: {
           email: 'user3@email.com',
@@ -151,7 +151,7 @@ describe('Message routes', () => {
     user3Token = user3Res.body.token;
 
     const user4Res = await request(app)
-      .post('/login')
+      .post('/api/auth/login')
       .send({
         data: {
           email: 'user4@email.com',
@@ -168,49 +168,49 @@ describe('Message routes', () => {
   });
 
   test('Messages route exists', async () => {
-    const res = await request(app).get('/messages');
+    const res = await request(app).get('/api/messages');
     expect(res.status).not.toBe(404);
   });
 
   test('Messages route responds with 200 status when token in header', async () => {
     const res = await request(app)
-      .get('/messages')
+      .get('/api/messages')
       .set('Authorization', `Bearer ${debbieToken}`);
     expect(res.status).toBe(200);
   });
 
   test('Messages route responds with 401 error when no token in header', async () => {
-    const res = await request(app).get('/messages');
+    const res = await request(app).get('/api/messages');
     expect(res.status).toBe(401);
   });
 
   test('Messages route responds with error msg when no token in header', async () => {
-    const res = await request(app).get('/messages');
+    const res = await request(app).get('/api/messages');
     expect(res.error.text).toContain('Not authorized, no token');
   });
 
   test('Messages route responds with an array when user is signed in', async () => {
     const res = await request(app)
-      .get('/messages')
+      .get('/api/messages')
       .set('Authorization', `Bearer ${debbieToken}`);
     expect(res.body.messages).toBeInstanceOf(Array);
   });
 
   test('New message route exists', async () => {
-    const res = await request(app).post('/messages/new');
+    const res = await request(app).post('/api/messages/new');
     expect(res.status).not.toBe(404);
   });
 
   test('New message route responds with 400 status when no body is sent', async () => {
     const res = await request(app)
-      .post('/messages/new')
+      .post('/api/messages/new')
       .set('Authorization', `Bearer ${maggieToken}`);
     expect(res.status).toBe(400);
   });
 
   test('New message route responds with error msg when no body is sent', async () => {
     const res = await request(app)
-      .post('/messages/new')
+      .post('/api/messages/new')
       .set('Authorization', `Bearer ${maggieToken}`);
     expect(res.error.text).toContain('No message submitted');
   });
@@ -218,7 +218,7 @@ describe('Message routes', () => {
   //? not sure this test is needed
   test('New message route responds with 400 status when no content is included', async () => {
     const res = await request(app)
-      .post('/messages/new')
+      .post('/api/messages/new')
       .set('Authorization', `Bearer ${maggieToken}`);
     expect(res.status).toBe(400);
   });
@@ -226,14 +226,14 @@ describe('Message routes', () => {
   //? not sure this test is needed
   test('New message route responds with error msg when no content is included', async () => {
     const res = await request(app)
-      .post('/messages/new')
+      .post('/api/messages/new')
       .set('Authorization', `Bearer ${maggieToken}`);
     expect(res.error.text).toContain('No message submitted');
   });
 
   test('New message route responds with 401 status when token is not included in header', async () => {
     const res = await request(app)
-      .post('/messages/new')
+      .post('/api/messages/new')
       .send({
         data: {
           content: 'Hello world',
@@ -244,7 +244,7 @@ describe('Message routes', () => {
 
   test('New message route responds with error msg when token is not included in header', async () => {
     const res = await request(app)
-      .post('/messages/new')
+      .post('/api/messages/new')
       .send({
         data: {
           content: 'Hello world',
@@ -255,7 +255,7 @@ describe('Message routes', () => {
 
   test('New message route responds with 201 status when new message submission is successful', async () => {
     const res = await request(app)
-      .post('/messages/new')
+      .post('/api/messages/new')
       .set('Authorization', `Bearer ${maggieToken}`)
       .send({
         data: {
@@ -267,7 +267,7 @@ describe('Message routes', () => {
 
   test('New message route responds with message when new message submission is successful', async () => {
     const res = await request(app)
-      .post('/messages/new')
+      .post('/api/messages/new')
       .set('Authorization', `Bearer ${maggieToken}`)
       .send({
         data: {
@@ -279,20 +279,20 @@ describe('Message routes', () => {
 
   test('Single message route exists', async () => {
     //! This is a strange test. If you don't include a legit-looking document id in the url, a 200 status is sent, bypassing any conditional checks in the controller. In short, may need to be rewritten or perhaps not included at all.
-    const res = await request(app).get('/messages/123');
+    const res = await request(app).get('/api/messages/123');
     expect(res.status).not.toBe(404);
   });
 
   test('Single message route responds with 400 when message id is wrong format', async () => {
     const res = await request(app)
-      .get('/messages/123')
+      .get('/api/messages/123')
       .set('Authorization', `Bearer ${maggieToken}`);
     expect(res.status).toBe(400);
   });
 
   test('Single message route responds with error msg when message id is wrong format', async () => {
     const res = await request(app)
-      .get('/messages/123')
+      .get('/api/messages/123')
       .set('Authorization', `Bearer ${maggieToken}`);
     expect(res.error.text).toContain('Message id is wrong format');
   });
@@ -300,7 +300,7 @@ describe('Message routes', () => {
   //? How can you honestly test for this? Maybe figure out which part of the id is the date? Maybe run this test with a cleared db?
   test('Single message route responds with 404 when message does not exist', async () => {
     const res = await request(app)
-      .get('/messages/615a8be41c2b20f6e47c256d')
+      .get('/api/messages/615a8be41c2b20f6e47c256d')
       .set('Authorization', `Bearer ${maggieToken}`);
     expect(res.status).toBe(404);
   });
@@ -308,40 +308,44 @@ describe('Message routes', () => {
   //? How can you honestly test for this? Maybe figure out which part of the id is the date? Maybe run this test with a cleared db?
   test('Single message route responds with error msg when message does not exist', async () => {
     const res = await request(app)
-      .get('/messages/615a8be41c2b20f6e47c256d')
+      .get('/api/messages/615a8be41c2b20f6e47c256d')
       .set('Authorization', `Bearer ${maggieToken}`);
     expect(res.error.text).toContain('No message found with id');
   });
 
   test('Single message route responds with 401 when token not in header', async () => {
     const msgRes = await request(app)
-      .post('/messages/new')
+      .post('/api/messages/new')
       .set('Authorization', `Bearer ${debbieToken}`)
       .send({
         data: {
           content: 'I am the Mom',
         },
       });
-    const res = await request(app).get(`/messages/${msgRes.body.message._id}`);
+    const res = await request(app).get(
+      `/api/messages/${msgRes.body.message._id}`
+    );
     expect(res.status).toBe(401);
   });
 
   test('Single message route responds with error msg when token not in header', async () => {
     const msgRes = await request(app)
-      .post('/messages/new')
+      .post('/api/messages/new')
       .set('Authorization', `Bearer ${maggieToken}`)
       .send({
         data: {
           content: 'I am the dog',
         },
       });
-    const res = await request(app).get(`/messages/${msgRes.body.message._id}`);
+    const res = await request(app).get(
+      `/api/messages/${msgRes.body.message._id}`
+    );
     expect(res.error.text).toContain('Not authorized, no token');
   });
 
   test('Single message route responds with 401 when author id does not match token', async () => {
     const msgRes = await request(app)
-      .post('/messages/new')
+      .post('/api/messages/new')
       .set('Authorization', `Bearer ${debbieToken}`)
       .send({
         data: {
@@ -349,14 +353,14 @@ describe('Message routes', () => {
         },
       });
     const res = await request(app)
-      .get(`/messages/${msgRes.body.message._id}`)
+      .get(`/api/messages/${msgRes.body.message._id}`)
       .set('Authorization', `Bearer ${maggieToken}`);
     expect(res.status).toBe(401);
   });
 
   test('Single message route responds with error msg when author id does not match token', async () => {
     const msgRes = await request(app)
-      .post('/messages/new')
+      .post('/api/messages/new')
       .set('Authorization', `Bearer ${maggieToken}`)
       .send({
         data: {
@@ -364,7 +368,7 @@ describe('Message routes', () => {
         },
       });
     const res = await request(app)
-      .get(`/messages/${msgRes.body.message._id}`)
+      .get(`/api/messages/${msgRes.body.message._id}`)
       .set('Authorization', `Bearer ${debbieToken}`);
     expect(res.error.text).toContain(
       'Not authorized, message not authored by user'
@@ -373,7 +377,7 @@ describe('Message routes', () => {
 
   test('Single message route responds with 200 when message exists', async () => {
     const msgRes = await request(app)
-      .post('/messages/new')
+      .post('/api/messages/new')
       .set('Authorization', `Bearer ${maggieToken}`)
       .send({
         data: {
@@ -381,14 +385,14 @@ describe('Message routes', () => {
         },
       });
     const res = await request(app)
-      .get(`/messages/${msgRes.body.message._id}`)
+      .get(`/api/messages/${msgRes.body.message._id}`)
       .set('Authorization', `Bearer ${maggieToken}`);
     expect(res.status).toBe(200);
   });
 
   test('Single message route responds with message when it exists', async () => {
     const msgRes = await request(app)
-      .post('/messages/new')
+      .post('/api/messages/new')
       .set('Authorization', `Bearer ${maggieToken}`)
       .send({
         data: {
@@ -396,14 +400,14 @@ describe('Message routes', () => {
         },
       });
     const res = await request(app)
-      .get(`/messages/${msgRes.body.message._id}`)
+      .get(`/api/messages/${msgRes.body.message._id}`)
       .set('Authorization', `Bearer ${maggieToken}`);
     expect(res.body.message).toBeTruthy();
   });
 
   test('New message route responds with parentId when submitted with one', async () => {
     const msgRes1 = await request(app)
-      .post('/messages/new')
+      .post('/api/messages/new')
       .set('Authorization', `Bearer ${user1Token}`)
       .send({
         data: {
@@ -411,7 +415,7 @@ describe('Message routes', () => {
         },
       });
     const msgRes2 = await request(app)
-      .post('/messages/new')
+      .post('/api/messages/new')
       .set('Authorization', `Bearer ${user2Token}`)
       .send({
         data: {
@@ -424,7 +428,7 @@ describe('Message routes', () => {
 
   test('New message route responds without parentId when submitted without one', async () => {
     const msgRes = await request(app)
-      .post('/messages/new')
+      .post('/api/messages/new')
       .set('Authorization', `Bearer ${maggieToken}`)
       .send({
         data: {
@@ -432,14 +436,14 @@ describe('Message routes', () => {
         },
       });
     const res = await request(app)
-      .get(`/messages/${msgRes.body.message._id}`)
+      .get(`/api/messages/${msgRes.body.message._id}`)
       .set('Authorization', `Bearer ${maggieToken}`);
     expect(res.body.message.parentId).toBeNull();
   });
 
   test('do not include participants that were not involved', async () => {
     const msgRes1 = await request(app)
-      .post('/messages/new')
+      .post('/api/messages/new')
       .set('Authorization', `Bearer ${user1Token}`)
       .send({
         data: {
@@ -451,7 +455,7 @@ describe('Message routes', () => {
     const msg1 = msgRes1.body.message;
 
     const msgRes2 = await request(app)
-      .post('/messages/new')
+      .post('/api/messages/new')
       .set('Authorization', `Bearer ${user2Token}`)
       .send({
         data: {
@@ -464,7 +468,7 @@ describe('Message routes', () => {
     const msg2 = msgRes2.body.message;
 
     const msgRes3 = await request(app)
-      .post('/messages/new')
+      .post('/api/messages/new')
       .set('Authorization', `Bearer ${user3Token}`)
       .send({
         data: {
@@ -477,7 +481,7 @@ describe('Message routes', () => {
     const msg3 = msgRes3.body.message;
 
     const msgRes4 = await request(app)
-      .post('/messages/new')
+      .post('/api/messages/new')
       .set('Authorization', `Bearer ${user2Token}`)
       .send({
         data: {
@@ -489,7 +493,7 @@ describe('Message routes', () => {
       });
 
     const msgRes5 = await request(app)
-      .post('/messages/new')
+      .post('/api/messages/new')
       .set('Authorization', `Bearer ${user2Token}`)
       .send({
         data: {
@@ -501,7 +505,7 @@ describe('Message routes', () => {
     const msg5 = msgRes5.body.message;
 
     const msgRes6 = await request(app)
-      .post('/messages/new')
+      .post('/api/messages/new')
       .set('Authorization', `Bearer ${user1Token}`)
       .send({
         data: {
@@ -513,7 +517,7 @@ describe('Message routes', () => {
       });
 
     const user1Messages = await request(app)
-      .get('/messages')
+      .get('/api/messages')
       .set('Authorization', `Bearer ${user1Token}`);
 
     const firstUser1MessageThreadFlat =
@@ -528,7 +532,7 @@ describe('Message routes', () => {
 
   test('do include participants involved', async () => {
     const user1Messages = await request(app)
-      .get('/messages')
+      .get('/api/messages')
       .set('Authorization', `Bearer ${user1Token}`);
 
     const firstUser1MessageThreadFlat =
@@ -544,7 +548,7 @@ describe('Message routes', () => {
 
   test('getMessages returns empty array when user has no messages', async () => {
     const user4Messages = await request(app)
-      .get('/messages')
+      .get('/api/messages')
       .set('Authorization', `Bearer ${user4Token}`);
 
     expect(user4Messages.body.messages).toHaveLength(0);
