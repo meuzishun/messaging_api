@@ -1,16 +1,12 @@
+const router = require('express').Router();
 const authRoutes = require('./auth');
 const messagesRoutes = require('./messages');
-const {
-  getContacts,
-  getProfile,
-  editProfile,
-} = require('../controllers/userController');
-const router = require('express').Router();
+const profileRoutes = require('./profile');
+const contactRoutes = require('./contacts');
 
 router.use('/auth', authRoutes);
 router.use('/messages', messagesRoutes);
-router.get('/contacts', getContacts);
-router.get('/profile', getProfile);
-router.post('/profile/edit', editProfile);
+router.use('/profile', profileRoutes);
+router.use('/contacts', contactRoutes);
 
 module.exports = router;
