@@ -1,8 +1,8 @@
 const router = require('express').Router();
 const authHandler = require('../middleware/authMiddleware');
 const {
-  getMessage,
   getMessages,
+  getMessage,
   createMessage,
 } = require('../controllers/messageController');
 
