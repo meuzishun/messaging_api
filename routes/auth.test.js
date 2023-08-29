@@ -5,15 +5,15 @@ const {
   disconnectMongoServer,
 } = require('../mongoTestingConfig');
 
+beforeAll(async () => {
+  await initializeMongoServer();
+});
+
+afterAll(async () => {
+  await disconnectMongoServer();
+});
+
 describe('Auth controllers', () => {
-  beforeAll(async () => {
-    await initializeMongoServer();
-  });
-
-  afterAll(async () => {
-    await disconnectMongoServer();
-  });
-
   describe('Register route', () => {
     test('Register route exists', async () => {
       const res = await request(app).post('/api/auth/register');

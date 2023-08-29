@@ -5,168 +5,168 @@ const {
   disconnectMongoServer,
 } = require('../mongoTestingConfig');
 
+let debbieUser;
+let debbieToken;
+let maggieUser;
+let maggieToken;
+let user1;
+let user1Token;
+let user2;
+let user2Token;
+let user3;
+let user3Token;
+let user4;
+let user4Token;
+
+beforeAll(async () => {
+  await initializeMongoServer();
+
+  // Register a bunch of users
+  await request(app)
+    .post('/api/auth/register')
+    .send({
+      data: {
+        firstName: 'Debbie',
+        lastName: 'Smith',
+        email: 'deb@email.com',
+        password: '1234password5678',
+      },
+    });
+
+  await request(app)
+    .post('/api/auth/register')
+    .send({
+      data: {
+        firstName: 'Maggie',
+        lastName: 'May',
+        email: 'maggie@email.com',
+        password: '1234password5678',
+      },
+    });
+
+  await request(app)
+    .post('/api/auth/register')
+    .send({
+      data: {
+        firstName: 'User',
+        lastName: 'One',
+        email: 'user1@email.com',
+        password: '1234password5678',
+      },
+    });
+
+  await request(app)
+    .post('/api/auth/register')
+    .send({
+      data: {
+        firstName: 'Second',
+        lastName: 'Dude',
+        email: 'user2@email.com',
+        password: '1234password5678',
+      },
+    });
+
+  await request(app)
+    .post('/api/auth/register')
+    .send({
+      data: {
+        firstName: 'Third',
+        lastName: 'Guy',
+        email: 'user3@email.com',
+        password: '1234password5678',
+      },
+    });
+
+  await request(app)
+    .post('/api/auth/register')
+    .send({
+      data: {
+        firstName: 'Fourth',
+        lastName: 'User',
+        email: 'user4@email.com',
+        password: '1234password5678',
+      },
+    });
+
+  // Login users
+  const debbieUserRes = await request(app)
+    .post('/api/auth/login')
+    .send({
+      data: {
+        email: 'deb@email.com',
+        password: '1234password5678',
+      },
+    });
+
+  debbieUser = debbieUserRes.body.user;
+  debbieToken = debbieUserRes.body.token;
+
+  const maggieUserRes = await request(app)
+    .post('/api/auth/login')
+    .send({
+      data: {
+        email: 'maggie@email.com',
+        password: '1234password5678',
+      },
+    });
+
+  maggieUser = maggieUserRes.body.user;
+  maggieToken = maggieUserRes.body.token;
+
+  const user1Res = await request(app)
+    .post('/api/auth/login')
+    .send({
+      data: {
+        email: 'user1@email.com',
+        password: '1234password5678',
+      },
+    });
+
+  user1 = user1Res.body.user;
+  user1Token = user1Res.body.token;
+
+  const user2Res = await request(app)
+    .post('/api/auth/login')
+    .send({
+      data: {
+        email: 'user2@email.com',
+        password: '1234password5678',
+      },
+    });
+
+  user2 = user2Res.body.user;
+  user2Token = user2Res.body.token;
+
+  const user3Res = await request(app)
+    .post('/api/auth/login')
+    .send({
+      data: {
+        email: 'user3@email.com',
+        password: '1234password5678',
+      },
+    });
+
+  user3 = user3Res.body.user;
+  user3Token = user3Res.body.token;
+
+  const user4Res = await request(app)
+    .post('/api/auth/login')
+    .send({
+      data: {
+        email: 'user4@email.com',
+        password: '1234password5678',
+      },
+    });
+
+  user4 = user4Res.body.user;
+  user4Token = user4Res.body.token;
+});
+
+afterAll(async () => {
+  await disconnectMongoServer();
+});
+
 describe('Message routes', () => {
-  let debbieUser;
-  let debbieToken;
-  let maggieUser;
-  let maggieToken;
-  let user1;
-  let user1Token;
-  let user2;
-  let user2Token;
-  let user3;
-  let user3Token;
-  let user4;
-  let user4Token;
-
-  beforeAll(async () => {
-    await initializeMongoServer();
-
-    // Register a bunch of users
-    await request(app)
-      .post('/api/auth/register')
-      .send({
-        data: {
-          firstName: 'Debbie',
-          lastName: 'Smith',
-          email: 'deb@email.com',
-          password: '1234password5678',
-        },
-      });
-
-    await request(app)
-      .post('/api/auth/register')
-      .send({
-        data: {
-          firstName: 'Maggie',
-          lastName: 'May',
-          email: 'maggie@email.com',
-          password: '1234password5678',
-        },
-      });
-
-    await request(app)
-      .post('/api/auth/register')
-      .send({
-        data: {
-          firstName: 'User',
-          lastName: 'One',
-          email: 'user1@email.com',
-          password: '1234password5678',
-        },
-      });
-
-    await request(app)
-      .post('/api/auth/register')
-      .send({
-        data: {
-          firstName: 'Second',
-          lastName: 'Dude',
-          email: 'user2@email.com',
-          password: '1234password5678',
-        },
-      });
-
-    await request(app)
-      .post('/api/auth/register')
-      .send({
-        data: {
-          firstName: 'Third',
-          lastName: 'Guy',
-          email: 'user3@email.com',
-          password: '1234password5678',
-        },
-      });
-
-    await request(app)
-      .post('/api/auth/register')
-      .send({
-        data: {
-          firstName: 'Fourth',
-          lastName: 'User',
-          email: 'user4@email.com',
-          password: '1234password5678',
-        },
-      });
-
-    // Login users
-    const debbieUserRes = await request(app)
-      .post('/api/auth/login')
-      .send({
-        data: {
-          email: 'deb@email.com',
-          password: '1234password5678',
-        },
-      });
-
-    debbieUser = debbieUserRes.body.user;
-    debbieToken = debbieUserRes.body.token;
-
-    const maggieUserRes = await request(app)
-      .post('/api/auth/login')
-      .send({
-        data: {
-          email: 'maggie@email.com',
-          password: '1234password5678',
-        },
-      });
-
-    maggieUser = maggieUserRes.body.user;
-    maggieToken = maggieUserRes.body.token;
-
-    const user1Res = await request(app)
-      .post('/api/auth/login')
-      .send({
-        data: {
-          email: 'user1@email.com',
-          password: '1234password5678',
-        },
-      });
-
-    user1 = user1Res.body.user;
-    user1Token = user1Res.body.token;
-
-    const user2Res = await request(app)
-      .post('/api/auth/login')
-      .send({
-        data: {
-          email: 'user2@email.com',
-          password: '1234password5678',
-        },
-      });
-
-    user2 = user2Res.body.user;
-    user2Token = user2Res.body.token;
-
-    const user3Res = await request(app)
-      .post('/api/auth/login')
-      .send({
-        data: {
-          email: 'user3@email.com',
-          password: '1234password5678',
-        },
-      });
-
-    user3 = user3Res.body.user;
-    user3Token = user3Res.body.token;
-
-    const user4Res = await request(app)
-      .post('/api/auth/login')
-      .send({
-        data: {
-          email: 'user4@email.com',
-          password: '1234password5678',
-        },
-      });
-
-    user4 = user4Res.body.user;
-    user4Token = user4Res.body.token;
-  });
-
-  afterAll(async () => {
-    await disconnectMongoServer();
-  });
-
   test('Messages route exists', async () => {
     const res = await request(app).get('/api/messages');
     expect(res.status).not.toBe(404);
