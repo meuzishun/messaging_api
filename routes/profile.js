@@ -1,12 +1,13 @@
 const router = require('express').Router();
+const authHandler = require('../middleware/authMiddleware');
 const {
   getProfile,
   editProfile,
   deleteProfile,
 } = require('../controllers/profileController');
 
-router.get('/', getProfile);
-router.put('/edit', editProfile);
-router.delete('/', deleteProfile);
+router.get('/', authHandler, getProfile);
+router.put('/edit', authHandler, editProfile);
+router.delete('/', authHandler, deleteProfile);
 
 module.exports = router;
