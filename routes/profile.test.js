@@ -94,7 +94,7 @@ describe('Get profile route', () => {
 describe('Edit profile route', () => {
   test('to have status of 401 when no auth', async () => {
     const res = await request(app)
-      .put('/api/profile/edit')
+      .put('/api/profile')
       .send({ data: { firstName: 'Da Maggs' } });
 
     expect(res.status).toBe(401);
@@ -102,7 +102,7 @@ describe('Edit profile route', () => {
 
   test('to throw error when no auth', async () => {
     const res = await request(app)
-      .put('/api/profile/edit')
+      .put('/api/profile')
       .send({ data: { firstName: 'Da Maggs' } });
 
     expect(res.error.text).toContain('Not authorized, no token');
@@ -110,7 +110,7 @@ describe('Edit profile route', () => {
 
   test('to have status of 201 on success', async () => {
     const res = await request(app)
-      .put('/api/profile/edit')
+      .put('/api/profile')
       .set('Authorization', `Bearer ${maggieUserRes.body.token}`)
       .send({ data: { firstName: 'Da Maggs' } });
 
@@ -119,7 +119,7 @@ describe('Edit profile route', () => {
 
   test('to respond with new user data on success', async () => {
     const res = await request(app)
-      .put('/api/profile/edit')
+      .put('/api/profile')
       .set('Authorization', `Bearer ${debbieUserRes.body.token}`)
       .send({ data: { firstName: 'Deborah' } });
 
@@ -128,7 +128,7 @@ describe('Edit profile route', () => {
 
   test('to have status of 200 on retrieve', async () => {
     await request(app)
-      .put('/api/profile/edit')
+      .put('/api/profile')
       .set('Authorization', `Bearer ${maggieUserRes.body.token}`)
       .send({ data: { firstName: 'Flubbles' } });
 
@@ -141,7 +141,7 @@ describe('Edit profile route', () => {
 
   test('to respond with new user data on retrieve', async () => {
     await request(app)
-      .put('/api/profile/edit')
+      .put('/api/profile')
       .set('Authorization', `Bearer ${debbieUserRes.body.token}`)
       .send({ data: { firstName: 'Deb' } });
 

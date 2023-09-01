@@ -7,7 +7,7 @@ const {
 } = require('../controllers/profileController');
 
 router.get('/', authHandler, getProfile);
-router.put('/edit', authHandler, editProfile);
+router.put('/', authHandler, editProfile);
 router.delete('/', authHandler, deleteProfile);
 
 module.exports = router;
