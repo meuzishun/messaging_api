@@ -83,7 +83,7 @@ const getMessage = asyncHandler(async (req, res) => {
 });
 
 // @desc    Post messages
-// @route   POST /messages/new
+// @route   POST /messages
 // @access  Private
 const createMessage = asyncHandler(async (req, res) => {
   const user = await User.findById(req.body.user._id);

@@ -10,8 +10,8 @@ const {
 
 router.get('/', authHandler, getMessages);
 router.get('/:messageId', authHandler, getMessage);
-router.post('/new', authHandler, createMessage);
-router.put('/:messageId/edit', authHandler, editMessage);
+router.post('/', authHandler, createMessage);
+router.put('/:messageId', authHandler, editMessage);
 router.delete('/:messageId', authHandler, deleteMessage);
 
 module.exports = router;
