@@ -1,6 +1,10 @@
+const asyncHandler = require('express-async-handler');
 const User = require('../models/user');
 
-const getProfile = async (req, res) => {
+// @desc    Get user profile
+// @route   GET /api/profile
+// @access  Private
+const getProfile = asyncHandler(async (req, res) => {
   const user = await User.findById(req.body.user._id);
 
   if (!user) {
@@ -9,9 +13,12 @@ const getProfile = async (req, res) => {
   }
 
   res.status(200).json({ user });
-};
+});
 
-const editProfile = async (req, res) => {
+// @desc    Edit user profile
+// @route   PUT /api/profile
+// @access  Private
+const editProfile = asyncHandler(async (req, res) => {
   const user = await User.findById(req.body.user._id);
 
   if (!user) {
@@ -24,9 +31,12 @@ const editProfile = async (req, res) => {
   });
 
   res.status(201).json({ user: newUser });
-};
+});
 
-const deleteProfile = async (req, res) => {
+// @desc    Delete user profile
+// @route   DELETE /api/profile
+// @access  Private
+const deleteProfile = asyncHandler(async (req, res) => {
   const user = await User.findById(req.body.user._id);
 
   if (!user) {
@@ -37,7 +47,7 @@ const deleteProfile = async (req, res) => {
   await User.findByIdAndDelete(user._id);
 
   res.status(200).json({ id: user._id });
-};
+});
 
 module.exports = {
   getProfile,

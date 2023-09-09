@@ -26,7 +26,7 @@ const getContacts = asyncHandler(async (req, res) => {
 // @desc    Post new contact
 // @route   POST /api/contacts
 // @access  Private
-const addContact = async (req, res) => {
+const addContact = asyncHandler(async (req, res) => {
   const user = await User.findById(req.body.user._id);
 
   if (!user) {
@@ -41,7 +41,7 @@ const addContact = async (req, res) => {
   );
 
   res.status(201).json({ user: updatedUser });
-};
+});
 
 // @desc    Get contact
 // @route   GET /api/contacts/:contactId

@@ -9,7 +9,7 @@ const pathToKey = path.join(__dirname, '..', '/config/id_rsa_priv.pem');
 const PRIV_KEY = fs.readFileSync(pathToKey, 'utf8');
 
 // @desc    Register user
-// @route   POST /register
+// @route   POST /api/register
 // @access  Public
 const registerUser = asyncHandler(async (req, res) => {
   if (!req.body.data) {
@@ -65,7 +65,7 @@ const registerUser = asyncHandler(async (req, res) => {
 });
 
 // @desc    Login user
-// @route   POST /login
+// @route   POST /api/login
 // @access  Public
 const loginUser = asyncHandler(async (req, res) => {
   if (!req.body.data) {
