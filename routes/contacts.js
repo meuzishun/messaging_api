@@ -1,4 +1,5 @@
 const router = require('express').Router();
+const authHandler = require('../middleware/authMiddleware');
 const {
   getContacts,
   addContact,
@@ -6,9 +7,9 @@ const {
   deleteContact,
 } = require('../controllers/contactsController');
 
-router.get('/', getContacts);
-router.put('/', addContact);
-router.get('/:contactId', getContact);
-router.delete('/:contactId', deleteContact);
+router.get('/', authHandler, getContacts);
+router.put('/', authHandler, addContact);
+router.get('/:contactId', authHandler, getContact);
+router.delete('/:contactId', authHandler, deleteContact);
 
 module.exports = router;
