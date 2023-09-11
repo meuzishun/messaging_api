@@ -41,6 +41,7 @@ describe('Auth controllers', () => {
         email: 'ayako@email.com',
         password: '1234password5678',
       };
+
       const res = await request(app).post('/api/auth/register').send({ data });
       expect(res.status).toBe(400);
     });
@@ -51,6 +52,7 @@ describe('Auth controllers', () => {
         email: 'ayako@email.com',
         password: '1234password5678',
       };
+
       const res = await request(app).post('/api/auth/register').send({ data });
       expect(res.error.text).toContain('No first name');
     });
@@ -61,6 +63,7 @@ describe('Auth controllers', () => {
         email: 'ayako@email.com',
         password: '1234password5678',
       };
+
       const res = await request(app).post('/api/auth/register').send({ data });
       expect(res.status).toBe(400);
     });
@@ -71,6 +74,7 @@ describe('Auth controllers', () => {
         email: 'ayako@email.com',
         password: '1234password5678',
       };
+
       const res = await request(app).post('/api/auth/register').send({ data });
       expect(res.error.text).toContain('No last name');
     });
@@ -81,6 +85,7 @@ describe('Auth controllers', () => {
         lastName: 'Hattori',
         password: '1234password5678',
       };
+
       const res = await request(app).post('/api/auth/register').send({ data });
       expect(res.status).toBe(400);
     });
@@ -91,6 +96,7 @@ describe('Auth controllers', () => {
         lastName: 'Hattori',
         password: '1234password5678',
       };
+
       const res = await request(app).post('/api/auth/register').send({ data });
       expect(res.error.text).toContain('No email');
     });
@@ -101,6 +107,7 @@ describe('Auth controllers', () => {
         lastName: 'Hattori',
         email: 'ayako@email.com',
       };
+
       const res = await request(app).post('/api/auth/register').send({ data });
       expect(res.status).toBe(400);
     });
@@ -111,6 +118,7 @@ describe('Auth controllers', () => {
         lastName: 'Hattori',
         email: 'ayako@email.com',
       };
+
       const res = await request(app).post('/api/auth/register').send({ data });
       expect(res.error.text).toContain('No password');
     });
@@ -122,6 +130,7 @@ describe('Auth controllers', () => {
         email: 'maggie@email.com',
         password: '1234password5678',
       };
+
       await request(app).post('/api/auth/register').send({ data });
       const res = await request(app).post('/api/auth/register').send({ data });
       expect(res.status).toBe(400);
@@ -134,6 +143,7 @@ describe('Auth controllers', () => {
         email: 'maggie@email.com',
         password: '1234password5678',
       };
+
       await request(app).post('/api/auth/register').send({ data });
       const res = await request(app).post('/api/auth/register').send({ data });
       expect(res.error.text).toContain('User already exists');
@@ -146,6 +156,7 @@ describe('Auth controllers', () => {
         email: 'ayako@email.com',
         password: '1234password5678',
       };
+
       const res = await request(app).post('/api/auth/register').send({ data });
       expect(res.status).toBe(201);
     });
@@ -157,6 +168,7 @@ describe('Auth controllers', () => {
         email: 'asmith@email.com',
         password: '1234password5678',
       };
+
       const res = await request(app).post('/api/auth/register').send({ data });
       expect(res.body.user.firstName).toEqual(data.firstName);
       expect(res.body.user.lastName).toEqual(data.lastName);
@@ -170,6 +182,7 @@ describe('Auth controllers', () => {
         email: 'user1@email.com',
         password: '1234password5678',
       };
+
       const res = await request(app).post('/api/auth/register').send({ data });
       expect(res.body.token).toBeTruthy();
     });
@@ -195,6 +208,7 @@ describe('Auth controllers', () => {
       const loginData = {
         email: 'me@email.com',
       };
+
       const res = await request(app).post('/api/auth/login').send(loginData);
       expect(res.status).toBe(400);
     });
@@ -203,9 +217,11 @@ describe('Auth controllers', () => {
       const loginData = {
         email: 'me@email.com',
       };
+
       const res = await request(app)
         .post('/api/auth/login')
         .send({ data: loginData });
+
       expect(res.error.text).toContain('No password');
     });
 
@@ -213,9 +229,11 @@ describe('Auth controllers', () => {
       const loginData = {
         password: '1234password5678',
       };
+
       const res = await request(app)
         .post('/api/auth/login')
         .send({ data: loginData });
+
       expect(res.status).toBe(400);
     });
 
@@ -223,9 +241,11 @@ describe('Auth controllers', () => {
       const loginData = {
         password: '1234password5678',
       };
+
       const res = await request(app)
         .post('/api/auth/login')
         .send({ data: loginData });
+
       expect(res.error.text).toContain('No email');
     });
 
@@ -234,9 +254,11 @@ describe('Auth controllers', () => {
         email: 'me@email.com',
         password: '1234password5678',
       };
+
       const res = await request(app)
         .post('/api/auth/login')
         .send({ data: loginData });
+
       expect(res.status).toBe(400);
     });
 
@@ -245,9 +267,11 @@ describe('Auth controllers', () => {
         email: 'me@email.com',
         password: '1234password5678',
       };
+
       const res = await request(app)
         .post('/api/auth/login')
         .send({ data: loginData });
+
       expect(res.error.text).toContain('No user with that email');
     });
 
@@ -258,16 +282,20 @@ describe('Auth controllers', () => {
         email: 'billy@email.com',
         password: '1234password5678',
       };
+
       await request(app)
         .post('/api/auth/register')
         .send({ data: registerData });
+
       const loginData = {
         email: registerData.email,
         password: 'thisIsIncorrect',
       };
+
       const res = await request(app)
         .post('/api/auth/login')
         .send({ data: loginData });
+
       expect(res.status).toBe(401);
     });
 
@@ -278,16 +306,20 @@ describe('Auth controllers', () => {
         email: 'billy@email.com',
         password: '1234password5678',
       };
+
       await request(app)
         .post('/api/auth/register')
         .send({ data: registerData });
+
       const loginData = {
         email: 'billy@email.com',
         password: 'thisIsIncorrect',
       };
+
       const res = await request(app)
         .post('/api/auth/login')
         .send({ data: loginData });
+
       expect(res.error.text).toContain('Incorrect password');
     });
 
@@ -296,9 +328,11 @@ describe('Auth controllers', () => {
         email: 'billy@email.com',
         password: '1234password5678',
       };
+
       const res = await request(app)
         .post('/api/auth/login')
         .send({ data: loginData });
+
       expect(res.status).toBe(200);
     });
 
@@ -309,11 +343,13 @@ describe('Auth controllers', () => {
         email: 'billy@email.com',
         password: '1234password5678',
       };
+
       const res = await request(app)
         .post('/api/auth/login')
         .send({
           data: { email: loginData.email, password: loginData.password },
         });
+
       expect(res.body.user.firstName).toEqual(loginData.firstName);
       expect(res.body.user.lastName).toEqual(loginData.lastName);
       expect(res.body.user.email).toEqual(loginData.email);
@@ -326,11 +362,13 @@ describe('Auth controllers', () => {
         email: 'billy@email.com',
         password: '1234password5678',
       };
+
       const res = await request(app)
         .post('/api/auth/login')
         .send({
           data: { email: loginData.email, password: loginData.password },
         });
+
       expect(res.body.token).toBeTruthy();
     });
   });
