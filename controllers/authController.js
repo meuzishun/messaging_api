@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const { body, validationResult } = require('express-validator');
 const asyncHandler = require('express-async-handler');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
@@ -67,44 +68,55 @@ const registerUser = asyncHandler(async (req, res) => {
 // @desc    Login user
 // @route   POST /api/login
 // @access  Public
-const loginUser = asyncHandler(async (req, res) => {
-  if (!req.body.data) {
-    res.status(400);
-    throw new Error('No user submitted');
-  }
-  const { email, password } = req.body.data;
+const loginUser = [
+  body('email')
+    .trim()
+    .isLength({ min: 1 })
+    .escape()
+    .isEmail()
+    .withMessage('Please include a valid email.'),
+  body('password')
+    .isLength({ min: 8 })
+    .withMessage('Password must be at least 8 characters.'),
+  asyncHandler(async (req, res) => {
+    if (!req.body.data) {
+      res.status(400);
+      throw new Error('No user submitted');
+    }
+    const { email, password } = req.body.data;
 
-  if (!password) {
-    res.status(400);
-    throw new Error('No password');
-  }
+    if (!password) {
+      res.status(400);
+      throw new Error('No password');
+    }
 
-  if (!email) {
-    res.status(400);
-    throw new Error('No email');
-  }
+    if (!email) {
+      res.status(400);
+      throw new Error('No email');
+    }
 
-  const user = await User.findOne({ email });
+    const user = await User.findOne({ email });
 
-  if (!user) {
-    res.status(400);
-    throw new Error('No user with that email');
-  }
+    if (!user) {
+      res.status(400);
+      throw new Error('No user with that email');
+    }
 
-  const validPassword = await bcrypt.compare(password, user.password);
+    const validPassword = await bcrypt.compare(password, user.password);
 
-  if (!validPassword) {
-    res.status(401);
-    throw new Error('Incorrect password');
-  }
+    if (!validPassword) {
+      res.status(401);
+      throw new Error('Incorrect password');
+    }
 
-  const token = jwt.sign({ id: user._id }, PRIV_KEY, {
-    expiresIn: '10d',
-    algorithm: 'RS256',
-  });
+    const token = jwt.sign({ id: user._id }, PRIV_KEY, {
+      expiresIn: '10d',
+      algorithm: 'RS256',
+    });
 
-  return res.status(200).json({ user, token });
-});
+    return res.status(200).json({ user, token });
+  }),
+];
 
 module.exports = {
   registerUser,
