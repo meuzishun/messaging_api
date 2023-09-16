@@ -73,7 +73,31 @@ describe('Edit profile route', () => {
     expect(res.error.text).toContain('Not authorized, no token');
   });
 
-  test('to have status of 201 on success', async () => {
+  test('to have status of 400 when no data sent', async () => {
+    const maggieUser = loggedInUsers.find(
+      (user) => user.firstName === 'Maggie'
+    );
+
+    const res = await request(app)
+      .put('/api/profile')
+      .set('Authorization', `Bearer ${maggieUser.token}`);
+
+    expect(res.status).toBe(400);
+  });
+
+  test('to throw error msg when no data sent', async () => {
+    const maggieUser = loggedInUsers.find(
+      (user) => user.firstName === 'Maggie'
+    );
+
+    const res = await request(app)
+      .put('/api/profile')
+      .set('Authorization', `Bearer ${maggieUser.token}`);
+
+    expect(res.error.text).toContain('No user data submitted');
+  });
+
+  test('to have status of 201 on successful first name change', async () => {
     const maggieUser = loggedInUsers.find(
       (user) => user.firstName === 'Maggie'
     );
@@ -86,7 +110,7 @@ describe('Edit profile route', () => {
     expect(res.status).toBe(201);
   });
 
-  test('to respond with new user data on success', async () => {
+  test('to respond with new user data on successful first name change', async () => {
     const debbieUser = loggedInUsers.find(
       (user) => user.firstName === 'Debbie'
     );
@@ -99,7 +123,7 @@ describe('Edit profile route', () => {
     expect(res.body.user.firstName).toBe('Deborah');
   });
 
-  test('to have status of 200 on retrieve', async () => {
+  test('to have status of 200 on retrieval after first name change', async () => {
     const maggieUser = loggedInUsers.find(
       (user) => user.firstName === 'Maggie'
     );
@@ -116,7 +140,7 @@ describe('Edit profile route', () => {
     expect(res.status).toBe(200);
   });
 
-  test('to respond with new user data on retrieve', async () => {
+  test('to respond with new user first name on retrieval', async () => {
     const debbieUser = loggedInUsers.find(
       (user) => user.firstName === 'Debbie'
     );
@@ -131,6 +155,148 @@ describe('Edit profile route', () => {
       .set('Authorization', `Bearer ${debbieUser.token}`);
 
     expect(res.body.user.firstName).toBe('Deb');
+  });
+
+  test('to have status of 201 on successful last name change', async () => {
+    const user1 = loggedInUsers.find((user) => user.firstName === 'User');
+
+    const res = await request(app)
+      .put('/api/profile')
+      .set('Authorization', `Bearer ${user1.token}`)
+      .send({ data: { lastName: 'NumberOne' } });
+
+    expect(res.status).toBe(201);
+  });
+
+  test('to respond with new user data on successful last name change', async () => {
+    const user1 = loggedInUsers.find((user) => user.firstName === 'User');
+
+    const res = await request(app)
+      .put('/api/profile')
+      .set('Authorization', `Bearer ${user1.token}`)
+      .send({ data: { lastName: 'NumeroUno' } });
+
+    expect(res.body.user.lastName).toBe('NumeroUno');
+  });
+
+  test('to have status of 200 on retrieval after last name change', async () => {
+    const maggieUser = loggedInUsers.find(
+      (user) => user.firstName === 'Maggie'
+    );
+
+    await request(app)
+      .put('/api/profile')
+      .set('Authorization', `Bearer ${maggieUser.token}`)
+      .send({ data: { lastName: 'Bubbles' } });
+
+    const res = await request(app)
+      .get('/api/profile')
+      .set('Authorization', `Bearer ${maggieUser.token}`);
+
+    expect(res.status).toBe(200);
+  });
+
+  test('to respond with new user last name on retrieval', async () => {
+    const maggieUser = loggedInUsers.find(
+      (user) => user.firstName === 'Maggie'
+    );
+
+    await request(app)
+      .put('/api/profile')
+      .set('Authorization', `Bearer ${maggieUser.token}`)
+      .send({ data: { lastName: 'Wubbles' } });
+
+    const res = await request(app)
+      .get('/api/profile')
+      .set('Authorization', `Bearer ${maggieUser.token}`);
+
+    expect(res.body.user.lastName).toBe('Wubbles');
+  });
+
+  test('to have status of 400 on bad email submit', async () => {
+    const maggieUser = loggedInUsers.find(
+      (user) => user.firstName === 'Maggie'
+    );
+
+    const res = await request(app)
+      .put('/api/profile')
+      .set('Authorization', `Bearer ${maggieUser.token}`)
+      .send({ data: { email: 'asdfqwer' } });
+
+    expect(res.status).toBe(400);
+  });
+
+  test('to respond with error msg on bad email submit', async () => {
+    const maggieUser = loggedInUsers.find(
+      (user) => user.firstName === 'Maggie'
+    );
+
+    const res = await request(app)
+      .put('/api/profile')
+      .set('Authorization', `Bearer ${maggieUser.token}`)
+      .send({ data: { email: 'asdfqwer' } });
+
+    expect(res.error.text).toContain('Please include a valid email');
+  });
+
+  test('to have status of 201 on successful email change', async () => {
+    const maggieUser = loggedInUsers.find(
+      (user) => user.firstName === 'Maggie'
+    );
+
+    const res = await request(app)
+      .put('/api/profile')
+      .set('Authorization', `Bearer ${maggieUser.token}`)
+      .send({ data: { email: 'asdf@qwer.com' } });
+
+    expect(res.status).toBe(201);
+  });
+
+  test('to respond with new user data on successful email change', async () => {
+    const maggieUser = loggedInUsers.find(
+      (user) => user.firstName === 'Maggie'
+    );
+
+    const res = await request(app)
+      .put('/api/profile')
+      .set('Authorization', `Bearer ${maggieUser.token}`)
+      .send({ data: { email: 'qwer@asdf.com' } });
+
+    expect(res.body.user.email).toBe('qwer@asdf.com');
+  });
+
+  test('to have status of 200 on retrieval after email change', async () => {
+    const maggieUser = loggedInUsers.find(
+      (user) => user.firstName === 'Maggie'
+    );
+
+    await request(app)
+      .put('/api/profile')
+      .set('Authorization', `Bearer ${maggieUser.token}`)
+      .send({ data: { email: 'damaggs@email.com' } });
+
+    const res = await request(app)
+      .get('/api/profile')
+      .set('Authorization', `Bearer ${maggieUser.token}`);
+
+    expect(res.status).toBe(200);
+  });
+
+  test('to respond with new user email on retrieval', async () => {
+    const maggieUser = loggedInUsers.find(
+      (user) => user.firstName === 'Maggie'
+    );
+
+    await request(app)
+      .put('/api/profile')
+      .set('Authorization', `Bearer ${maggieUser.token}`)
+      .send({ data: { email: 'maggs@email.com' } });
+
+    const res = await request(app)
+      .get('/api/profile')
+      .set('Authorization', `Bearer ${maggieUser.token}`);
+
+    expect(res.body.user.email).toBe('maggs@email.com');
   });
 });
 
