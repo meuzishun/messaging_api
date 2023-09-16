@@ -1,3 +1,4 @@
+const { body, validationResult } = require('express-validator');
 const asyncHandler = require('express-async-handler');
 const User = require('../models/user');
 
@@ -18,20 +19,58 @@ const getProfile = asyncHandler(async (req, res) => {
 // @desc    Edit user profile
 // @route   PUT /api/profile
 // @access  Private
-const editProfile = asyncHandler(async (req, res) => {
-  const user = await User.findById(req.body.user._id);
+const editProfile = [
+  body('data').notEmpty().withMessage('No user data submitted'),
 
-  if (!user) {
-    res.status(404);
-    throw new Error('No user found');
-  }
+  body('data.firstName').notEmpty().trim().withMessage('No First Name'),
 
-  const newUser = await User.findByIdAndUpdate(user._id, req.body.data, {
-    returnDocument: 'after',
-  });
+  body('data.lastName').notEmpty().trim().withMessage('No Last Name'),
 
-  res.status(201).json({ user: newUser });
-});
+  body('data.email')
+    .notEmpty()
+    .withMessage('No Email')
+    .isEmail()
+    .withMessage('Please include a valid email'),
+
+  asyncHandler(async (req, res) => {
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+      const errorMessages = errors.array().map((error) => error.msg);
+
+      if (
+        errorMessages.includes('No user data submitted') ||
+        (errorMessages.includes('No First Name') &&
+          errorMessages.includes('No Last Name') &&
+          errorMessages.includes('No Email'))
+      ) {
+        res.status(400);
+        throw new Error('No user data submitted');
+      }
+
+      if (
+        !errorMessages.includes('No Email') &&
+        errorMessages.includes('Please include a valid email')
+      ) {
+        res.status(400);
+        throw new Error('Please include a valid email');
+      }
+    }
+
+    const user = await User.findById(req.body.user._id);
+
+    if (!user) {
+      res.status(404);
+      throw new Error('No user found');
+    }
+
+    const newUser = await User.findByIdAndUpdate(user._id, req.body.data, {
+      returnDocument: 'after',
+    });
+
+    res.status(201).json({ user: newUser });
+  }),
+];
 
 // @desc    Delete user profile
 // @route   DELETE /api/profile
