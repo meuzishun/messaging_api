@@ -12,88 +12,87 @@ const PRIV_KEY = fs.readFileSync(pathToKey, 'utf8');
 // @desc    Register user
 // @route   POST /api/register
 // @access  Public
-const registerUser = asyncHandler(async (req, res) => {
-  if (!req.body.data) {
-    res.status(400);
-    throw new Error('No user data submitted');
-  }
+const registerUser = [
+  body('data').notEmpty().withMessage('No user data submitted'),
 
-  const { firstName, lastName, email, password } = req.body.data;
+  body('data.firstName').notEmpty().withMessage('No first name'),
 
-  if (!firstName) {
-    res.status(400);
-    throw new Error('No first name');
-  }
+  body('data.lastName').notEmpty().withMessage('No last name'),
 
-  if (!lastName) {
-    res.status(400);
-    throw new Error('No last name');
-  }
+  body('data.email')
+    .notEmpty()
+    .withMessage('No email')
+    .trim()
+    .escape()
+    .isEmail()
+    .withMessage('Please include a valid email'),
 
-  if (!email) {
-    res.status(400);
-    throw new Error('No email');
-  }
+  body('data.password').notEmpty().withMessage('No password'),
 
-  if (!password) {
-    res.status(400);
-    throw new Error('No password');
-  }
+  asyncHandler(async (req, res) => {
+    const errors = validationResult(req);
 
-  const userExists = await User.findOne({ email });
+    if (!errors.isEmpty()) {
+      const errorMessages = errors.array().map((error) => error.msg);
+      res.status(400);
+      throw new Error(errorMessages[0]);
+    }
 
-  if (userExists) {
-    res.status(400);
-    throw new Error('User already exists');
-  }
+    const { firstName, lastName, email, password } = req.body.data;
 
-  const salt = await bcrypt.genSalt(10);
-  const hashedPassword = await bcrypt.hash(password, salt);
+    const userExists = await User.findOne({ email });
 
-  const user = await User.create({
-    firstName,
-    lastName,
-    email,
-    password: hashedPassword,
-  });
+    if (userExists) {
+      res.status(400);
+      throw new Error('User already exists');
+    }
 
-  const token = jwt.sign({ id: user._id }, PRIV_KEY, {
-    expiresIn: '10d',
-    algorithm: 'RS256',
-  });
+    const salt = await bcrypt.genSalt(10);
 
-  return res.status(201).json({ user, token });
-});
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    const user = await User.create({
+      firstName,
+      lastName,
+      email,
+      password: hashedPassword,
+    });
+
+    const token = jwt.sign({ id: user._id }, PRIV_KEY, {
+      expiresIn: '10d',
+      algorithm: 'RS256',
+    });
+
+    return res.status(201).json({ user, token });
+  }),
+];
 
 // @desc    Login user
 // @route   POST /api/login
 // @access  Public
 const loginUser = [
-  body('email')
+  body('data').notEmpty().withMessage('No user submitted'),
+
+  body('data.email')
+    .notEmpty()
+    .withMessage('No email')
     .trim()
-    .isLength({ min: 1 })
     .escape()
     .isEmail()
-    .withMessage('Please include a valid email.'),
-  body('password')
-    .isLength({ min: 8 })
-    .withMessage('Password must be at least 8 characters.'),
+    .withMessage('Please include a valid email'),
+
+  body('data.password').notEmpty().withMessage('No password'),
+
   asyncHandler(async (req, res) => {
-    if (!req.body.data) {
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+      const errorMessages = errors.array().map((error) => error.msg);
       res.status(400);
-      throw new Error('No user submitted');
+      throw new Error(errorMessages[0]);
     }
+
     const { email, password } = req.body.data;
-
-    if (!password) {
-      res.status(400);
-      throw new Error('No password');
-    }
-
-    if (!email) {
-      res.status(400);
-      throw new Error('No email');
-    }
 
     const user = await User.findOne({ email });
 
