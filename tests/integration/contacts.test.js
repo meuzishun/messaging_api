@@ -189,6 +189,32 @@ describe('Add contacts route', () => {
     expect(res.error.text).toContain('Not authorized, no token');
   });
 
+  test('responds with 400 status when contact id is not valid mongo id', async () => {
+    const { token: maggieToken } = loggedInUsers.find(
+      (user) => user.firstName === 'Maggie'
+    );
+
+    const res = await request(app)
+      .put('/api/contacts')
+      .set('authorization', `Bearer ${maggieToken}`)
+      .send({ contactId: '1234abcd' });
+
+    expect(res.status).toBe(400);
+  });
+
+  test('responds with error msg when contact id is not valid mongo id', async () => {
+    const { token: maggieToken } = loggedInUsers.find(
+      (user) => user.firstName === 'Maggie'
+    );
+
+    const res = await request(app)
+      .put('/api/contacts')
+      .set('authorization', `Bearer ${maggieToken}`)
+      .send({ contactId: '1234abcd' });
+
+    expect(res.error.text).toContain('Invalid contact ID');
+  });
+
   test('responds with 201 status when user is signed in', async () => {
     const maggieUser = loggedInUsers.find(
       (user) => user.firstName === 'Maggie'
@@ -254,6 +280,30 @@ describe('Get contact route', () => {
     const user1 = loggedInUsers.find((user) => user.firstName === 'User');
     const res = await request(app).get(`/api/contacts/${user1._id}`);
     expect(res.error.text).toContain('Not authorized, no token');
+  });
+
+  test('responds with 400 status when contact id is not valid mongo id', async () => {
+    const { token: maggieToken } = loggedInUsers.find(
+      (user) => user.firstName === 'Maggie'
+    );
+
+    const res = await request(app)
+      .get('/api/contacts/1234abcd')
+      .set('authorization', `Bearer ${maggieToken}`);
+
+    expect(res.status).toBe(400);
+  });
+
+  test('responds with error msg when contact id is not valid mongo id', async () => {
+    const { token: maggieToken } = loggedInUsers.find(
+      (user) => user.firstName === 'Maggie'
+    );
+
+    const res = await request(app)
+      .get('/api/contacts/1234abcd')
+      .set('authorization', `Bearer ${maggieToken}`);
+
+    expect(res.error.text).toContain('Invalid contact ID');
   });
 
   test('responds with 400 status when user is not friends with contact', async () => {
@@ -341,6 +391,30 @@ describe('Delete contacts route', () => {
       .set('authorization', `Bearer ${user2Token}`);
 
     expect(res.status).toBe(400);
+  });
+
+  test('responds with 400 status when contact id is not valid mongo id', async () => {
+    const { token: maggieToken } = loggedInUsers.find(
+      (user) => user.firstName === 'Maggie'
+    );
+
+    const res = await request(app)
+      .delete('/api/contacts/1234abcd')
+      .set('authorization', `Bearer ${maggieToken}`);
+
+    expect(res.status).toBe(400);
+  });
+
+  test('responds with error msg when contact id is not valid mongo id', async () => {
+    const { token: maggieToken } = loggedInUsers.find(
+      (user) => user.firstName === 'Maggie'
+    );
+
+    const res = await request(app)
+      .delete('/api/contacts/1234abcd')
+      .set('authorization', `Bearer ${maggieToken}`);
+
+    expect(res.error.text).toContain('Invalid contact ID');
   });
 
   test('responds with error msg when user is not friends with contact', async () => {
