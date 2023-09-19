@@ -1,3 +1,4 @@
+const { body, param, validationResult } = require('express-validator');
 const asyncHandler = require('express-async-handler');
 const Message = require('../models/message');
 const User = require('../models/user');
@@ -52,136 +53,173 @@ const getMessages = asyncHandler(async (req, res) => {
 // @desc    Get a single message
 // @route   GET /api/messages/:messageId
 // @access  Private
-const getMessage = asyncHandler(async (req, res) => {
-  const user = await User.findById(req.body.user._id);
+const getMessage = [
+  param('messageId').isMongoId().withMessage('Invalid message ID'),
 
-  if (!user) {
-    res.status(400);
-    throw new Error('No user found');
-  }
+  asyncHandler(async (req, res) => {
+    const errors = validationResult(req);
 
-  const { messageId } = req.params;
+    if (!errors.isEmpty()) {
+      const errorMessages = errors.array().map((error) => error.msg);
+      res.status(400);
+      throw new Error(errorMessages[0]);
+    }
 
-  if (!ObjectId.isValid(messageId)) {
-    res.status(400);
-    throw new Error('Message id is wrong format');
-  }
+    const user = await User.findById(req.body.user._id);
 
-  const message = await Message.findById(messageId);
+    if (!user) {
+      res.status(400);
+      throw new Error('No user found');
+    }
 
-  if (!message) {
-    res.status(404);
-    throw new Error('No message found with id');
-  }
+    const message = await Message.findById(req.params.messageId);
 
-  if (message.author.toString() !== user._id.toString()) {
-    res.status(401);
-    throw new Error('Not authorized, message not authored by user');
-  }
+    if (!message) {
+      res.status(404);
+      throw new Error('No message found with id');
+    }
 
-  return res.status(200).json({ message });
-});
+    if (message.author.toString() !== user._id.toString()) {
+      res.status(401);
+      throw new Error('Not authorized, message not authored by user');
+    }
+
+    return res.status(200).json({ message });
+  }),
+];
 
 // @desc    Post messages
 // @route   POST /api/messages
 // @access  Private
-const createMessage = asyncHandler(async (req, res) => {
-  const user = await User.findById(req.body.user._id);
+const createMessage = [
+  body('data.content')
+    .trim()
+    .isLength({ min: 1 })
+    .escape()
+    .withMessage('Message has no content'),
 
-  if (!user) {
-    res.status(400);
-    throw new Error('No author submitted');
-  }
+  asyncHandler(async (req, res) => {
+    const errors = validationResult(req);
 
-  const data = req.body.data;
+    if (!errors.isEmpty()) {
+      const errorMessages = errors.array().map((error) => error.msg);
+      res.status(400);
+      throw new Error(errorMessages[0]);
+    }
 
-  if (!data) {
-    res.status(400);
-    throw new Error('No message submitted');
-  }
+    const user = await User.findById(req.body.user._id);
 
-  const message = await Message.create({
-    ...req.body.data,
-    author: user._id,
-    timestamp: new Date(),
-  });
+    if (!user) {
+      res.status(400);
+      throw new Error('No author submitted');
+    }
 
-  return res.status(201).json({ message });
-});
+    const message = await Message.create({
+      ...req.body.data,
+      author: user._id,
+      timestamp: new Date(),
+    });
+
+    return res.status(201).json({ message });
+  }),
+];
 
 // @desc    Edit message
 // @route   PUT /api/messages/:messageId/edit
 // @access  Private
-const editMessage = asyncHandler(async (req, res) => {
-  const user = await User.findById(req.body.user._id);
+const editMessage = [
+  param('messageId').isMongoId().withMessage('Invalid message ID'),
 
-  if (!user) {
-    res.status(401);
-    throw new Error('No author submitted');
-  }
+  body('data.content')
+    .trim()
+    .isLength({ min: 1 })
+    .escape()
+    .withMessage('Message has no content'),
 
-  const message = await Message.findById(req.params.messageId);
+  asyncHandler(async (req, res) => {
+    const errors = validationResult(req);
 
-  if (!message) {
-    res.status(404);
-    throw new Error('Message not found');
-  }
+    if (!errors.isEmpty()) {
+      const errorMessages = errors.array().map((error) => error.msg);
+      res.status(400);
+      throw new Error(errorMessages[0]);
+    }
 
-  if (user._id.toString() !== message.author.toString()) {
-    res.status(400);
-    throw new Error(
-      'Cannot alter message when author and user ids do not match'
+    const user = await User.findById(req.body.user._id);
+
+    if (!user) {
+      res.status(401);
+      throw new Error('No author submitted');
+    }
+
+    const message = await Message.findById(req.params.messageId);
+
+    if (!message) {
+      res.status(404);
+      throw new Error('Message not found');
+    }
+
+    if (user._id.toString() !== message.author.toString()) {
+      res.status(400);
+      throw new Error(
+        'Cannot alter message when author and user ids do not match'
+      );
+    }
+
+    const newMessage = await Message.findByIdAndUpdate(
+      req.params.messageId,
+      {
+        content: req.body.data.content,
+        timestamp: new Date(),
+      },
+      { returnDocument: 'after' }
     );
-  }
 
-  const newData = req.body.data;
-
-  if (!newData) {
-    res.status(400);
-    throw new Error('No message data sent');
-  }
-
-  const newMessage = await Message.findByIdAndUpdate(
-    req.params.messageId,
-    {
-      content: newData.content,
-      timestamp: new Date(),
-    },
-    { returnDocument: 'after' }
-  );
-
-  res.status(201).json({ message: newMessage });
-});
+    res.status(201).json({ message: newMessage });
+  }),
+];
 
 // @desc    Delete message
 // @route   DELETE /api/messages/:messageId
 // @access  Private
-const deleteMessage = asyncHandler(async (req, res) => {
-  const user = await User.findById(req.body.user._id);
+const deleteMessage = [
+  param('messageId').isMongoId().withMessage('Invalid message ID'),
 
-  if (!user) {
-    res.status(401);
-    throw new Error('No user found');
-  }
+  asyncHandler(async (req, res) => {
+    const errors = validationResult(req);
 
-  const message = await Message.findById(req.params.messageId);
+    if (!errors.isEmpty()) {
+      const errorMessages = errors.array().map((error) => error.msg);
+      res.status(400);
+      throw new Error(errorMessages[0]);
+    }
 
-  if (!message) {
-    res.status(404);
-    throw new Error('No message found');
-  }
+    const user = await User.findById(req.body.user._id);
 
-  if (user._id.toString() !== message.author.toString()) {
-    res.status(400);
-    throw new Error(
-      'Cannot delete message when author and user ids do not match'
-    );
-  }
+    if (!user) {
+      res.status(401);
+      throw new Error('No user found');
+    }
 
-  const deletedMsgId = await Message.findByIdAndDelete(req.params.messageId);
+    const message = await Message.findById(req.params.messageId);
 
-  res.status(200).json({ id: message._id });
-});
+    if (!message) {
+      res.status(404);
+      throw new Error('No message found');
+    }
+
+    if (user._id.toString() !== message.author.toString()) {
+      res.status(400);
+      throw new Error(
+        'Cannot delete message when author and user ids do not match'
+      );
+    }
+
+    const deletedMsgId = await Message.findByIdAndDelete(req.params.messageId);
+
+    res.status(200).json({ id: message._id });
+  }),
+];
 
 module.exports = {
   getMessages,
