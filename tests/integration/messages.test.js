@@ -84,7 +84,7 @@ describe('Message routes', () => {
       .post('/api/messages')
       .set('Authorization', `Bearer ${maggieToken}`);
 
-    expect(res.error.text).toContain('No message submitted');
+    expect(res.error.text).toContain('Message has no content');
   });
 
   //? not sure this test is needed
@@ -110,7 +110,7 @@ describe('Message routes', () => {
       .post('/api/messages')
       .set('Authorization', `Bearer ${maggieToken}`);
 
-    expect(res.error.text).toContain('No message submitted');
+    expect(res.error.text).toContain('Message has no content');
   });
 
   test('New message route responds with 401 status when token is not included in header', async () => {
@@ -198,7 +198,7 @@ describe('Message routes', () => {
       .get('/api/messages/123')
       .set('Authorization', `Bearer ${maggieToken}`);
 
-    expect(res.error.text).toContain('Message id is wrong format');
+    expect(res.error.text).toContain('Invalid message ID');
   });
 
   //? How can you honestly test for this? Maybe figure out which part of the id is the date? Maybe run this test with a cleared db?
@@ -361,6 +361,23 @@ describe('Message routes', () => {
       .set('Authorization', `Bearer ${maggieToken}`);
 
     expect(res.body.message).toBeTruthy();
+  });
+
+  test('New message route responds with 400 status when message body is empty', async () => {
+    const { token: maggieToken } = loggedInUsers.find(
+      (user) => user.firstName === 'Maggie'
+    );
+
+    const res = await request(app)
+      .post('/api/messages')
+      .set('Authorization', `Bearer ${maggieToken}`)
+      .send({
+        data: {
+          content: '',
+        },
+      });
+
+    expect(res.status).toBe(400);
   });
 
   test('New message route responds with parentId when submitted with one', async () => {
@@ -665,7 +682,7 @@ describe('Message routes', () => {
       .put(`/api/messages/${msgId}`)
       .set('Authorization', `Bearer ${user1Token}`);
 
-    expect(res.error.text).toContain('No message data sent');
+    expect(res.error.text).toContain('Message has no content');
   });
 
   test('edit message responds with 400 when authors do not match', async () => {
@@ -883,6 +900,48 @@ describe('Message routes', () => {
     );
 
     expect(res.error.text).toContain('Not authorized, no token');
+  });
+
+  test('deleteMessage route responds with 400 status when messageId is invalid', async () => {
+    const { token: maggieToken } = loggedInUsers.find(
+      (user) => user.firstName === 'User'
+    );
+
+    await request(app)
+      .post('/api/messages')
+      .set('Authorization', `Bearer ${maggieToken}`)
+      .send({
+        data: {
+          content: 'I am a bad message to be deleted',
+        },
+      });
+
+    const res = await request(app)
+      .delete('/api/messages/123abc')
+      .set('Authorization', `Bearer ${maggieToken}`);
+
+    expect(res.status).toBe(400);
+  });
+
+  test('deleteMessage route responds with error msg when messageId is invalid', async () => {
+    const { token: debbieToken } = loggedInUsers.find(
+      (user) => user.firstName === 'User'
+    );
+
+    await request(app)
+      .post('/api/messages')
+      .set('Authorization', `Bearer ${debbieToken}`)
+      .send({
+        data: {
+          content: 'I am a bad message to be deleted',
+        },
+      });
+
+    const res = await request(app)
+      .delete('/api/messages/123abc')
+      .set('Authorization', `Bearer ${debbieToken}`);
+
+    expect(res.error.text).toContain('Invalid message ID');
   });
 
   test('deleteMessage route responds with 404 when no message exists', async () => {
