@@ -6,7 +6,7 @@ const {
   searchUsers,
 } = require('../controllers/userController');
 
-router.get('/search', searchUsers); // TODO: insert authHandler
+router.get('/search', authHandler, searchUsers);
 router.get('/', getUsers); // TODO: insert authHandler
 router.get('/:userId', getUser); // TODO: insert authHandler
 
