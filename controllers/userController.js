@@ -1,9 +1,22 @@
+const asyncHandler = require('express-async-handler');
+const User = require('../models/user');
+
 // @desc    Search users
 // @route   GET /api/users/search
 // @access  Private
-const searchUsers = async (req, res) => {
-  res.json({ msg: 'Searching users...' });
-};
+const searchUsers = asyncHandler(async (req, res) => {
+  const { query } = req.query;
+
+  const users = await User.find({
+    $or: [
+      { firstName: { $regex: query, $options: 'i' } },
+      { lastName: { $regex: query, $options: 'i' } },
+      { email: { $regex: query, $options: 'i' } },
+    ],
+  });
+
+  res.status(200).json({ users });
+});
 
 // @desc    Get single user
 // @route   GET /api/users/:userId
