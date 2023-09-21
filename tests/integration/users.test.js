@@ -49,6 +49,30 @@ describe('Search users route', () => {
     expect(res.error.text).toContain('Not authorized, no token');
   });
 
+  test('responds with 400 status when query string is invalid', async () => {
+    const { token: user1Token } = loggedInUsers.find(
+      (user) => user.firstName === 'User'
+    );
+
+    const res = await request(app)
+      .get('/api/users/search?query=')
+      .set('Authorization', `Bearer ${user1Token}`);
+
+    expect(res.status).toBe(400);
+  });
+
+  test('responds with error msg when query string is invalid', async () => {
+    const { token: user1Token } = loggedInUsers.find(
+      (user) => user.firstName === 'User'
+    );
+
+    const res = await request(app)
+      .get('/api/users/search?query=')
+      .set('Authorization', `Bearer ${user1Token}`);
+
+    expect(res.error.text).toContain('Query string is invalid');
+  });
+
   test('responds with 200 status when token present', async () => {
     const { token: user1Token } = loggedInUsers.find(
       (user) => user.firstName === 'User'
@@ -110,31 +134,139 @@ describe('Search users route', () => {
   });
 });
 
-describe('Get user route', () => {
-  test.skip('', async () => {
-    const res = await request(app).get(`/api/users/${id}`);
+describe.skip('Get user route', () => {
+  test('responds with 401 status when no token in header', async () => {
+    const { _id: user1id } = loggedInUsers.find(
+      (user) => user.firstName === 'User'
+    );
+
+    const res = await request(app).get(`/api/users/${user1id}`);
+
+    expect(res.status).toBe(401);
+  });
+
+  test('responds with error msg when no token in header', async () => {
+    const { _id: user1id } = loggedInUsers.find(
+      (user) => user.firstName === 'User'
+    );
+
+    const res = await request(app).get(`/api/users/${user1id}`);
+
+    expect(res.error.text).toContain('Not authorized, no token');
+  });
+
+  test('responds with 400 status when id provided is invalid', async () => {
+    const { token: maggieToken } = loggedInUsers.find(
+      (user) => user.firstName === 'Maggie'
+    );
+
+    const res = await request(app)
+      .get(`/api/users/a1b2c3`)
+      .set('Authorization', `Bearer ${maggieToken}`);
+
+    expect(res.status).toBe(400);
+  });
+
+  test('responds with error msg when id provided is invalid', async () => {
+    const { token: maggieToken } = loggedInUsers.find(
+      (user) => user.firstName === 'Maggie'
+    );
+
+    const res = await request(app)
+      .get(`/api/users/a1b2c3`)
+      .set('Authorization', `Bearer ${maggieToken}`);
+
+    expect(res.error.text).toContain('Invalid user ID');
+  });
+
+  test('responds with 200 status when provided id finds a user', async () => {
+    const { _id: user1id } = loggedInUsers.find(
+      (user) => user.firstName === 'User'
+    );
+
+    const { token: maggieToken } = loggedInUsers.find(
+      (user) => user.firstName === 'Maggie'
+    );
+
+    const res = await request(app)
+      .get(`/api/users/${user1id}`)
+      .set('Authorization', `Bearer ${maggieToken}`);
+
+    expect(res.status).toBe(200);
+  });
+
+  test('responds with 400 status when no user is found', async () => {
+    const { token: maggieToken } = loggedInUsers.find(
+      (user) => user.firstName === 'Maggie'
+    );
+
+    const res = await request(app)
+      .get('/api/users/615a8be41c2b20f6e47c256d')
+      .set('Authorization', `Bearer ${maggieToken}`);
+
+    expect(res.status).toBe(400);
+  });
+
+  test('responds with error msg when no user is found', async () => {
+    const { token: maggieToken } = loggedInUsers.find(
+      (user) => user.firstName === 'Maggie'
+    );
+
+    const res = await request(app)
+      .get('/api/users/615a8be41c2b20f6e47c256d')
+      .set('Authorization', `Bearer ${maggieToken}`);
+
+    expect(res.error.text).toContain('No user found');
+  });
+
+  test('responds with user first name that matches id provided', async () => {
+    const user1 = loggedInUsers.find((user) => user.firstName === 'User');
+
+    const { token: maggieToken } = loggedInUsers.find(
+      (user) => user.firstName === 'Maggie'
+    );
+
+    const res = await request(app)
+      .get(`/api/users/${user1._id}`)
+      .set('Authorization', `Bearer ${maggieToken}`);
+
+    expect(res.body.user.firstName).toBe(user1.firstName);
+  });
+
+  test('responds with user last name that matches id provided', async () => {
+    const user1 = loggedInUsers.find((user) => user.firstName === 'User');
+
+    const { token: maggieToken } = loggedInUsers.find(
+      (user) => user.firstName === 'Maggie'
+    );
+
+    const res = await request(app)
+      .get(`/api/users/${user1._id}`)
+      .set('Authorization', `Bearer ${maggieToken}`);
+
+    expect(res.body.user.lastName).toBe(user1.lastName);
+  });
+
+  test('responds with user email that matches id provided', async () => {
+    const user1 = loggedInUsers.find((user) => user.firstName === 'User');
+
+    const { token: maggieToken } = loggedInUsers.find(
+      (user) => user.firstName === 'Maggie'
+    );
+
+    const res = await request(app)
+      .get(`/api/users/${user1._id}`)
+      .set('Authorization', `Bearer ${maggieToken}`);
+
+    expect(res.body.user.email).toBe(user1.email);
   });
 
   test.skip('', async () => {
     const res = await request(app).get(`/api/users/${id}`);
   });
-
   test.skip('', async () => {
     const res = await request(app).get(`/api/users/${id}`);
   });
-
-  test.skip('', async () => {
-    const res = await request(app).get(`/api/users/${id}`);
-  });
-
-  test.skip('', async () => {
-    const res = await request(app).get(`/api/users/${id}`);
-  });
-
-  test.skip('', async () => {
-    const res = await request(app).get(`/api/users/${id}`);
-  });
-
   test.skip('', async () => {
     const res = await request(app).get(`/api/users/${id}`);
   });
