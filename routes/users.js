@@ -8,6 +8,6 @@ const {
 
 router.get('/search', authHandler, searchUsers);
 router.get('/', getUsers); // TODO: insert authHandler
-router.get('/:userId', getUser); // TODO: insert authHandler
+router.get('/:userId', authHandler, getUser);
 
 module.exports = router;
