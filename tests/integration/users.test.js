@@ -18,26 +18,6 @@ afterAll(async () => {
   await disconnectMongoServer();
 });
 
-describe.skip('Initial tests', () => {
-  test("searchUsers returns 'Searching users...'", async () => {
-    const res = await request(app).get('/api/users/search');
-
-    expect(res.body.msg).toBe('Searching users...');
-  });
-
-  test("getUser returns 'Get single user'", async () => {
-    const res = await request(app).get('/api/users/123');
-
-    expect(res.body.msg).toBe('Get single user');
-  });
-
-  test("getUsers returns 'Get all users'", async () => {
-    const res = await request(app).get('/api/users');
-
-    expect(res.body.msg).toBe('Get all users');
-  });
-});
-
 describe('Search users route', () => {
   test('responds with 401 status when no token in header', async () => {
     const res = await request(app).get('/api/users/search?query=Maggie');
@@ -134,7 +114,7 @@ describe('Search users route', () => {
   });
 });
 
-describe.skip('Get user route', () => {
+describe('Get user route', () => {
   test('responds with 401 status when no token in header', async () => {
     const { _id: user1id } = loggedInUsers.find(
       (user) => user.firstName === 'User'
@@ -260,44 +240,124 @@ describe.skip('Get user route', () => {
 
     expect(res.body.user.email).toBe(user1.email);
   });
-
-  test.skip('', async () => {
-    const res = await request(app).get(`/api/users/${id}`);
-  });
-  test.skip('', async () => {
-    const res = await request(app).get(`/api/users/${id}`);
-  });
-  test.skip('', async () => {
-    const res = await request(app).get(`/api/users/${id}`);
-  });
 });
 
 describe('Get users route', () => {
-  test.skip('', async () => {
+  test('responds with 401 status when no token in header', async () => {
     const res = await request(app).get('/api/users');
+    expect(res.status).toBe(401);
   });
 
-  test.skip('', async () => {
+  test('responds with error msg when no token in header', async () => {
     const res = await request(app).get('/api/users');
+    expect(res.error.text).toContain('Not authorized, no token');
   });
 
-  test.skip('', async () => {
-    const res = await request(app).get('/api/users');
+  test('responds with 400 status when limit query in url is not integer', async () => {
+    const { token: maggieToken } = loggedInUsers.find(
+      (user) => user.firstName === 'Maggie'
+    );
+
+    const res = await request(app)
+      .get('/api/users?page=2&limit=5.5')
+      .set('Authorization', `Bearer ${maggieToken}`);
+
+    expect(res.status).toBe(400);
   });
 
-  test.skip('', async () => {
-    const res = await request(app).get('/api/users');
+  test('responds with 400 status when limit query in url is not integer', async () => {
+    const { token: maggieToken } = loggedInUsers.find(
+      (user) => user.firstName === 'Maggie'
+    );
+
+    const res = await request(app)
+      .get('/api/users?page=2&limit=5.5')
+      .set('Authorization', `Bearer ${maggieToken}`);
+
+    expect(res.error.text).toContain('Limit must be an integer');
   });
 
-  test.skip('', async () => {
-    const res = await request(app).get('/api/users');
+  test('responds with 400 status when page query in url is not integer', async () => {
+    const { token: maggieToken } = loggedInUsers.find(
+      (user) => user.firstName === 'Maggie'
+    );
+
+    const res = await request(app)
+      .get('/api/users?page=2.3&limit=10')
+      .set('Authorization', `Bearer ${maggieToken}`);
+
+    expect(res.status).toBe(400);
   });
 
-  test.skip('', async () => {
-    const res = await request(app).get('/api/users');
+  test('responds with 400 status when page query in url is not integer', async () => {
+    const { token: maggieToken } = loggedInUsers.find(
+      (user) => user.firstName === 'Maggie'
+    );
+
+    const res = await request(app)
+      .get('/api/users?page=2.3&limit=10')
+      .set('Authorization', `Bearer ${maggieToken}`);
+
+    expect(res.error.text).toContain('Page must be an integer');
   });
 
-  test.skip('', async () => {
-    const res = await request(app).get('/api/users');
+  test('responds with 200 status when token in header', async () => {
+    const { token: maggieToken } = loggedInUsers.find(
+      (user) => user.firstName === 'Maggie'
+    );
+
+    const res = await request(app)
+      .get('/api/users')
+      .set('Authorization', `Bearer ${maggieToken}`);
+
+    expect(res.status).toBe(200);
+  });
+
+  test('responds with array of users when token in header', async () => {
+    const { token: maggieToken } = loggedInUsers.find(
+      (user) => user.firstName === 'Maggie'
+    );
+
+    const res = await request(app)
+      .get('/api/users')
+      .set('Authorization', `Bearer ${maggieToken}`);
+
+    expect(Array.isArray(res.body.users)).toBe(true);
+  });
+
+  test('responds with array no longer than 10', async () => {
+    const { token: maggieToken } = loggedInUsers.find(
+      (user) => user.firstName === 'Maggie'
+    );
+
+    const res = await request(app)
+      .get('/api/users')
+      .set('Authorization', `Bearer ${maggieToken}`);
+
+    expect(res.body.users.length).not.toBeGreaterThan(10);
+  });
+
+  test('responds with remaining users when included in params', async () => {
+    const { token: maggieToken } = loggedInUsers.find(
+      (user) => user.firstName === 'Maggie'
+    );
+
+    const res = await request(app)
+      .get('/api/users?page=2&limit=10')
+      .set('Authorization', `Bearer ${maggieToken}`);
+
+    expect(res.body.users.length).toBe(2);
+  });
+
+  test('responds with empty array when requesting a page beyond the number of users', async () => {
+    const { token: maggieToken } = loggedInUsers.find(
+      (user) => user.firstName === 'Maggie'
+    );
+
+    const res = await request(app)
+      .get('/api/users?page=3&limit=10')
+      .set('Authorization', `Bearer ${maggieToken}`);
+
+    expect(res.body.users.length).toBe(0);
   });
 });
