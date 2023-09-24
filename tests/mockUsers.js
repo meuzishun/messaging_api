@@ -50,6 +50,54 @@ const mockUsersObj = {
       password: '1234password5678',
     },
   },
+  user5: {
+    data: {
+      firstName: 'Fifth',
+      lastName: 'Human',
+      email: 'user5@email.com',
+      password: '1234password5678',
+    },
+  },
+  user6: {
+    data: {
+      firstName: 'Sixth',
+      lastName: 'User',
+      email: 'user6@email.com',
+      password: '1234password5678',
+    },
+  },
+  user7: {
+    data: {
+      firstName: 'Seventh',
+      lastName: 'User',
+      email: 'user7@email.com',
+      password: '1234password5678',
+    },
+  },
+  user8: {
+    data: {
+      firstName: 'Eight',
+      lastName: 'IsGreat',
+      email: 'user8@email.com',
+      password: '1234password5678',
+    },
+  },
+  user9: {
+    data: {
+      firstName: 'Nine',
+      lastName: 'Rhymes',
+      email: 'user9@email.com',
+      password: '1234password5678',
+    },
+  },
+  user10: {
+    data: {
+      firstName: 'Tenth',
+      lastName: 'User',
+      email: 'user10@email.com',
+      password: '1234password5678',
+    },
+  },
 };
 
 const mockUsers = [
@@ -87,6 +135,42 @@ const mockUsers = [
     firstName: 'Fourth',
     lastName: 'User',
     email: 'user4@email.com',
+    password: '1234password5678',
+  },
+  {
+    firstName: 'Fifth',
+    lastName: 'Human',
+    email: 'user5@email.com',
+    password: '1234password5678',
+  },
+  {
+    firstName: 'Sixth',
+    lastName: 'User',
+    email: 'user6@email.com',
+    password: '1234password5678',
+  },
+  {
+    firstName: 'Seventh',
+    lastName: 'User',
+    email: 'user7@email.com',
+    password: '1234password5678',
+  },
+  {
+    firstName: 'Eight',
+    lastName: 'IsGreat',
+    email: 'user8@email.com',
+    password: '1234password5678',
+  },
+  {
+    firstName: 'Nine',
+    lastName: 'Rhymes',
+    email: 'user9@email.com',
+    password: '1234password5678',
+  },
+  {
+    firstName: 'Tenth',
+    lastName: 'User',
+    email: 'user10@email.com',
     password: '1234password5678',
   },
 ];
