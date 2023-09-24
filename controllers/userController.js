@@ -60,9 +60,31 @@ const getUser = [
 // @desc    Get users
 // @route   GET /api/users
 // @access  Private
-const getUsers = async (req, res) => {
-  res.json({ msg: 'Get all users' });
-};
+const getUsers = [
+  query('page').optional().isInt().withMessage('Page must be an integer'),
+
+  query('limit').optional().isInt().withMessage('Limit must be an integer'),
+
+  asyncHandler(async (req, res) => {
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+      const errorMessages = errors.array().map((error) => error.msg);
+      res.status(400);
+      throw new Error(errorMessages[0]);
+    }
+
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+
+    const users = await User.find()
+      .sort({ lastName: 'asc', firstName: 'asc' })
+      .skip((page - 1) * limit)
+      .limit(limit);
+
+    res.status(200).json({ users });
+  }),
+];
 
 module.exports = {
   searchUsers,
