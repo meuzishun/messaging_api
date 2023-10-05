@@ -525,7 +525,7 @@ describe('Message routes', () => {
       .set('Authorization', `Bearer ${user1Token}`);
 
     const firstUser1MessageThreadFlat =
-      user1Messages.body.messages[1].flat(Infinity);
+      user1Messages.body.messages[2].flat(Infinity);
 
     const firstUser1MessageThreadIDs = firstUser1MessageThreadFlat.map(
       (msg) => msg.author._id
@@ -1112,5 +1112,28 @@ describe('Message routes', () => {
       .set('Authorization', `Bearer ${maggieToken}`);
 
     expect(res.error.text).toContain('No message found');
+  });
+});
+
+describe('Get message route', () => {
+  test('responds with array of length 1 when only one message thread exists', async () => {
+    const { token: user10token } = loggedInUsers.find(
+      (user) => user.firstName === 'Tenth'
+    );
+
+    await request(app)
+      .post('/api/messages')
+      .set('Authorization', `Bearer ${user10token}`)
+      .send({
+        data: {
+          content: 'I am a test message.',
+        },
+      });
+
+    const res = await request(app)
+      .get('/api/messages')
+      .set('Authorization', `Bearer ${user10token}`);
+
+    expect(res.body.messages.length).toBe(1);
   });
 });
