@@ -6,7 +6,7 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const bcrypt = require('bcryptjs');
 
-const pathToKey = path.join(__dirname, '..', '/config/id_rsa_priv.pem');
+const pathToKey = path.join(__dirname, '..', '/id_rsa_priv.pem');
 const PRIV_KEY = fs.readFileSync(pathToKey, 'utf8');
 
 // @desc    Register user
