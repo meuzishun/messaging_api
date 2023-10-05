@@ -17,7 +17,7 @@ const getMessages = asyncHandler(async (req, res) => {
   }
 
   const heads = await Message.find({
-    participants: { $in: user._id },
+    $or: [{ participants: user._id }, { author: user._id }],
     parentId: null,
   })
     .populate('author')
