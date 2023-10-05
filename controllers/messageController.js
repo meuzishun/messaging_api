@@ -29,7 +29,7 @@ const getMessages = asyncHandler(async (req, res) => {
     let searching = true;
 
     while (searching) {
-      let lastMessage = threads[i].at(-1);
+      let lastMessage = threads[i][threads[i].length - 1];
 
       let message = await Message.findOne({
         parentId: lastMessage._id,
