@@ -1136,4 +1136,44 @@ describe('Get message route', () => {
 
     expect(res.body.messages.length).toBe(1);
   });
+
+  test('populates author data with firstName and lastName properties', async () => {
+    const { token: user1Token, _id: user1id } = loggedInUsers.find(
+      (user) => user.firstName === 'User'
+    );
+
+    const res = await request(app)
+      .get('/api/messages')
+      .set('Authorization', `Bearer ${user1Token}`);
+
+    const authors = res.body.messages
+      .flat(Infinity)
+      .map((message) => message.author);
+
+    for (const author of authors) {
+      expect(author).toHaveProperty('firstName');
+      expect(author).toHaveProperty('lastName');
+    }
+  });
+
+  test('populates author data without unnecessary properties', async () => {
+    const { token: user1Token, _id: user1id } = loggedInUsers.find(
+      (user) => user.firstName === 'User'
+    );
+
+    const res = await request(app)
+      .get('/api/messages')
+      .set('Authorization', `Bearer ${user1Token}`);
+
+    const authors = res.body.messages
+      .flat(Infinity)
+      .map((message) => message.author);
+
+    for (const author of authors) {
+      expect(author).not.toHaveProperty('_id');
+      expect(author).not.toHaveProperty('email');
+      expect(author).not.toHaveProperty('password');
+      expect(author).not.toHaveProperty('friends');
+    }
+  });
 });
