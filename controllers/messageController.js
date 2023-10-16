@@ -20,7 +20,7 @@ const getMessages = asyncHandler(async (req, res) => {
     $or: [{ participants: user._id }, { author: user._id }],
     parentId: null,
   })
-    .populate('author')
+    .populate('author', 'firstName lastName')
     .populate('participants');
 
   const threads = heads.map((head) => [head]);
@@ -34,7 +34,7 @@ const getMessages = asyncHandler(async (req, res) => {
       let message = await Message.findOne({
         parentId: lastMessage._id,
       })
-        .populate('author')
+        .populate('author', 'firstName lastName')
         .populate('participants');
 
       if (message) {
