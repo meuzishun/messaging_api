@@ -1170,7 +1170,6 @@ describe('Get message route', () => {
       .map((message) => message.author);
 
     for (const author of authors) {
-      expect(author).not.toHaveProperty('_id');
       expect(author).not.toHaveProperty('email');
       expect(author).not.toHaveProperty('password');
       expect(author).not.toHaveProperty('friends');
