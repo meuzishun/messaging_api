@@ -215,6 +215,32 @@ describe('Add contacts route', () => {
     expect(res.error.text).toContain('Invalid contact ID');
   });
 
+  test('responds with 400 status when contact id is same a logged in user id', async () => {
+    const maggieUser = loggedInUsers.find(
+      (user) => user.firstName === 'Maggie'
+    );
+
+    const res = await request(app)
+      .put('/api/contacts')
+      .set('authorization', `Bearer ${maggieUser.token}`)
+      .send({ contactId: `${maggieUser._id}` });
+
+    expect(res.status).toBe(400);
+  });
+
+  test('responds with error msg when contact id is same a logged in user id', async () => {
+    const maggieUser = loggedInUsers.find(
+      (user) => user.firstName === 'Maggie'
+    );
+
+    const res = await request(app)
+      .put('/api/contacts')
+      .set('authorization', `Bearer ${maggieUser.token}`)
+      .send({ contactId: `${maggieUser._id}` });
+
+    expect(res.error.text).toContain('Invalid contact ID');
+  });
+
   test('responds with 201 status when user is signed in', async () => {
     const maggieUser = loggedInUsers.find(
       (user) => user.firstName === 'Maggie'
