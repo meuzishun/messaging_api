@@ -39,6 +39,11 @@ const addContact = [
       throw new Error(errorMessages[0]);
     }
 
+    if (req.body.user._id.toString() === req.body.contactId) {
+      res.status(400);
+      throw new Error('Invalid contact ID');
+    }
+
     const user = await User.findById(req.body.user._id);
 
     if (!user) {
