@@ -293,6 +293,40 @@ describe('Add contacts route', () => {
 
     expect(res.body.user.friends).toContain(user2._id);
   });
+
+  test('responds with 400 status when contact id is already a contact', async () => {
+    const maggieUser = loggedInUsers.find(
+      (user) => user.firstName === 'Maggie'
+    );
+
+    const { token: debbieToken } = loggedInUsers.find(
+      (user) => user.firstName === 'Debbie'
+    );
+
+    const res = await request(app)
+      .put('/api/contacts')
+      .set('authorization', `Bearer ${debbieToken}`)
+      .send({ contactId: maggieUser._id });
+
+    expect(res.status).toBe(400);
+  });
+
+  test('responds with error msg when contact id is already a contact', async () => {
+    const maggieUser = loggedInUsers.find(
+      (user) => user.firstName === 'Maggie'
+    );
+
+    const { token: debbieToken } = loggedInUsers.find(
+      (user) => user.firstName === 'Debbie'
+    );
+
+    const res = await request(app)
+      .put('/api/contacts')
+      .set('authorization', `Bearer ${debbieToken}`)
+      .send({ contactId: maggieUser._id });
+
+    expect(res.error.text).toContain('Contact already listed');
+  });
 });
 
 describe('Get contact route', () => {
