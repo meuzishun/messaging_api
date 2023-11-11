@@ -51,6 +51,11 @@ const addContact = [
       throw new Error('No user found');
     }
 
+    if (user.friends.includes(req.body.contactId)) {
+      res.status(400);
+      throw new Error('Contact already listed');
+    }
+
     const updatedUser = await User.findByIdAndUpdate(
       user._id,
       { $push: { friends: req.body.contactId } },
