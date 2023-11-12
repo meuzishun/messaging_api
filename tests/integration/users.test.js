@@ -465,6 +465,76 @@ describe('Get users route', () => {
     expect(Array.isArray(res.body.users)).toBe(true);
   });
 
+  test("responds with users' firstName when user found", async () => {
+    const { token: user1Token } = loggedInUsers.find(
+      (user) => user.firstName === 'User'
+    );
+
+    const res = await request(app)
+      .get('/api/users')
+      .set('Authorization', `Bearer ${user1Token}`);
+
+    for (const user of res.body.users) {
+      expect(user).toHaveProperty('firstName');
+    }
+  });
+
+  test("responds with users' lastName when user found", async () => {
+    const { token: user1Token } = loggedInUsers.find(
+      (user) => user.firstName === 'User'
+    );
+
+    const res = await request(app)
+      .get('/api/users')
+      .set('Authorization', `Bearer ${user1Token}`);
+
+    for (const user of res.body.users) {
+      expect(user).toHaveProperty('lastName');
+    }
+  });
+
+  test("responds with users' email when user found", async () => {
+    const { token: user1Token } = loggedInUsers.find(
+      (user) => user.firstName === 'User'
+    );
+
+    const res = await request(app)
+      .get('/api/users')
+      .set('Authorization', `Bearer ${user1Token}`);
+
+    for (const user of res.body.users) {
+      expect(user).toHaveProperty('email');
+    }
+  });
+
+  test("responds without users' password when user found", async () => {
+    const { token: user1Token } = loggedInUsers.find(
+      (user) => user.firstName === 'User'
+    );
+
+    const res = await request(app)
+      .get('/api/users')
+      .set('Authorization', `Bearer ${user1Token}`);
+
+    for (const user of res.body.users) {
+      expect(user).not.toHaveProperty('password');
+    }
+  });
+
+  test("responds without users' friends array when user found", async () => {
+    const { token: user1Token } = loggedInUsers.find(
+      (user) => user.firstName === 'User'
+    );
+
+    const res = await request(app)
+      .get('/api/users')
+      .set('Authorization', `Bearer ${user1Token}`);
+
+    for (const user of res.body.users) {
+      expect(user).not.toHaveProperty('friends');
+    }
+  });
+
   test('responds with array no longer than 10', async () => {
     const { token: maggieToken } = loggedInUsers.find(
       (user) => user.firstName === 'Maggie'
