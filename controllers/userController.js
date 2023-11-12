@@ -8,6 +8,10 @@ const User = require('../models/user');
 const searchUsers = [
   query('query').not().isEmpty().withMessage('Query string is invalid'),
 
+  query('page').optional().isInt().withMessage('Page must be an integer'),
+
+  query('limit').optional().isInt().withMessage('Limit must be an integer'),
+
   asyncHandler(async (req, res) => {
     const errors = validationResult(req);
 
@@ -18,6 +22,8 @@ const searchUsers = [
     }
 
     const { query } = req.query;
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
 
     const users = await User.find(
       {
@@ -28,7 +34,10 @@ const searchUsers = [
         ],
       },
       '-password -friends'
-    );
+    )
+      .sort({ lastName: 'asc', firstName: 'asc' })
+      .skip((page - 1) * limit)
+      .limit(limit);
 
     res.status(200).json({ users });
   }),
