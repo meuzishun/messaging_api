@@ -19,13 +19,16 @@ const searchUsers = [
 
     const { query } = req.query;
 
-    const users = await User.find({
-      $or: [
-        { firstName: { $regex: query, $options: 'i' } },
-        { lastName: { $regex: query, $options: 'i' } },
-        { email: { $regex: query, $options: 'i' } },
-      ],
-    });
+    const users = await User.find(
+      {
+        $or: [
+          { firstName: { $regex: query, $options: 'i' } },
+          { lastName: { $regex: query, $options: 'i' } },
+          { email: { $regex: query, $options: 'i' } },
+        ],
+      },
+      '-password -friends'
+    );
 
     res.status(200).json({ users });
   }),
