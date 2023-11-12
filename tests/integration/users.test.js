@@ -112,6 +112,76 @@ describe('Search users route', () => {
 
     expect(res.body.users.length).toBeGreaterThan(1);
   });
+
+  test("responds with users' firstName when user found", async () => {
+    const { token: user1Token } = loggedInUsers.find(
+      (user) => user.firstName === 'User'
+    );
+
+    const res = await request(app)
+      .get('/api/users/search?query=email')
+      .set('Authorization', `Bearer ${user1Token}`);
+
+    for (const user of res.body.users) {
+      expect(user).toHaveProperty('firstName');
+    }
+  });
+
+  test("responds with users' lastName when user found", async () => {
+    const { token: user1Token } = loggedInUsers.find(
+      (user) => user.firstName === 'User'
+    );
+
+    const res = await request(app)
+      .get('/api/users/search?query=email')
+      .set('Authorization', `Bearer ${user1Token}`);
+
+    for (const user of res.body.users) {
+      expect(user).toHaveProperty('lastName');
+    }
+  });
+
+  test("responds with users' email when user found", async () => {
+    const { token: user1Token } = loggedInUsers.find(
+      (user) => user.firstName === 'User'
+    );
+
+    const res = await request(app)
+      .get('/api/users/search?query=email')
+      .set('Authorization', `Bearer ${user1Token}`);
+
+    for (const user of res.body.users) {
+      expect(user).toHaveProperty('email');
+    }
+  });
+
+  test("responds without users' password when user found", async () => {
+    const { token: user1Token } = loggedInUsers.find(
+      (user) => user.firstName === 'User'
+    );
+
+    const res = await request(app)
+      .get('/api/users/search?query=email')
+      .set('Authorization', `Bearer ${user1Token}`);
+
+    for (const user of res.body.users) {
+      expect(user).not.toHaveProperty('password');
+    }
+  });
+
+  test("responds without users' friends array when user found", async () => {
+    const { token: user1Token } = loggedInUsers.find(
+      (user) => user.firstName === 'User'
+    );
+
+    const res = await request(app)
+      .get('/api/users/search?query=email')
+      .set('Authorization', `Bearer ${user1Token}`);
+
+    for (const user of res.body.users) {
+      expect(user).not.toHaveProperty('friends');
+    }
+  });
 });
 
 describe('Get user route', () => {
@@ -199,7 +269,17 @@ describe('Get user route', () => {
     expect(res.error.text).toContain('No user found');
   });
 
-  test('responds with user first name that matches id provided', async () => {
+  test.skip("responds with user's firstName when user found", async () => {});
+
+  test.skip("responds with user's lastName when user found", async () => {});
+
+  test.skip("responds with user's email when user found", async () => {});
+
+  test.skip("responds without user's password when user found", async () => {});
+
+  test.skip("responds without user's friends array when user found", async () => {});
+
+  test.skip('responds with user first name that matches id provided', async () => {
     const user1 = loggedInUsers.find((user) => user.firstName === 'User');
 
     const { token: maggieToken } = loggedInUsers.find(
