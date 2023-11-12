@@ -182,6 +182,42 @@ describe('Search users route', () => {
       expect(user).not.toHaveProperty('friends');
     }
   });
+
+  test('responds with array no longer than 10', async () => {
+    const { token: maggieToken } = loggedInUsers.find(
+      (user) => user.firstName === 'Maggie'
+    );
+
+    const res = await request(app)
+      .get('/api/users/search?query=email')
+      .set('Authorization', `Bearer ${maggieToken}`);
+
+    expect(res.body.users.length).not.toBeGreaterThan(10);
+  });
+
+  test('responds with remaining users when included in params', async () => {
+    const { token: maggieToken } = loggedInUsers.find(
+      (user) => user.firstName === 'Maggie'
+    );
+
+    const res = await request(app)
+      .get('/api/users/search?query=email&page=2&limit=10')
+      .set('Authorization', `Bearer ${maggieToken}`);
+
+    expect(res.body.users.length).toBe(2);
+  });
+
+  test('responds with empty array when requesting a page beyond the number of users', async () => {
+    const { token: maggieToken } = loggedInUsers.find(
+      (user) => user.firstName === 'Maggie'
+    );
+
+    const res = await request(app)
+      .get('/api/users/search?query=email&page=3&limit=10')
+      .set('Authorization', `Bearer ${maggieToken}`);
+
+    expect(res.body.users.length).toBe(0);
+  });
 });
 
 describe('Get user route', () => {
