@@ -49,7 +49,7 @@ const getUser = [
       throw new Error(errorMessages[0]);
     }
 
-    const user = await User.findById(req.params.userId);
+    const user = await User.findById(req.params.userId, '-password -friends');
 
     if (!user) {
       res.status(400);
