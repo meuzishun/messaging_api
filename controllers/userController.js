@@ -80,7 +80,7 @@ const getUsers = [
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
 
-    const users = await User.find()
+    const users = await User.find({}, '-password -friends')
       .sort({ lastName: 'asc', firstName: 'asc' })
       .skip((page - 1) * limit)
       .limit(limit);
