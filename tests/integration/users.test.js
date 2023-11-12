@@ -269,15 +269,75 @@ describe('Get user route', () => {
     expect(res.error.text).toContain('No user found');
   });
 
-  test.skip("responds with user's firstName when user found", async () => {});
+  test("responds with user's firstName when user found", async () => {
+    const user1 = loggedInUsers.find((user) => user.firstName === 'User');
 
-  test.skip("responds with user's lastName when user found", async () => {});
+    const { token: maggieToken } = loggedInUsers.find(
+      (user) => user.firstName === 'Maggie'
+    );
 
-  test.skip("responds with user's email when user found", async () => {});
+    const res = await request(app)
+      .get(`/api/users/${user1._id}`)
+      .set('Authorization', `Bearer ${maggieToken}`);
 
-  test.skip("responds without user's password when user found", async () => {});
+    expect(res.body.user).toHaveProperty('firstName');
+  });
 
-  test.skip("responds without user's friends array when user found", async () => {});
+  test("responds with user's lastName when user found", async () => {
+    const user1 = loggedInUsers.find((user) => user.firstName === 'User');
+
+    const { token: maggieToken } = loggedInUsers.find(
+      (user) => user.firstName === 'Maggie'
+    );
+
+    const res = await request(app)
+      .get(`/api/users/${user1._id}`)
+      .set('Authorization', `Bearer ${maggieToken}`);
+
+    expect(res.body.user).toHaveProperty('lastName');
+  });
+
+  test("responds with user's email when user found", async () => {
+    const user1 = loggedInUsers.find((user) => user.firstName === 'User');
+
+    const { token: maggieToken } = loggedInUsers.find(
+      (user) => user.firstName === 'Maggie'
+    );
+
+    const res = await request(app)
+      .get(`/api/users/${user1._id}`)
+      .set('Authorization', `Bearer ${maggieToken}`);
+
+    expect(res.body.user).toHaveProperty('email');
+  });
+
+  test("responds without user's password when user found", async () => {
+    const user1 = loggedInUsers.find((user) => user.firstName === 'User');
+
+    const { token: maggieToken } = loggedInUsers.find(
+      (user) => user.firstName === 'Maggie'
+    );
+
+    const res = await request(app)
+      .get(`/api/users/${user1._id}`)
+      .set('Authorization', `Bearer ${maggieToken}`);
+
+    expect(res.body.user).not.toHaveProperty('password');
+  });
+
+  test("responds without user's friends array when user found", async () => {
+    const user1 = loggedInUsers.find((user) => user.firstName === 'User');
+
+    const { token: maggieToken } = loggedInUsers.find(
+      (user) => user.firstName === 'Maggie'
+    );
+
+    const res = await request(app)
+      .get(`/api/users/${user1._id}`)
+      .set('Authorization', `Bearer ${maggieToken}`);
+
+    expect(res.body.user).not.toHaveProperty('friends');
+  });
 
   test.skip('responds with user first name that matches id provided', async () => {
     const user1 = loggedInUsers.find((user) => user.firstName === 'User');
