@@ -116,7 +116,10 @@ const loginUser = [
       algorithm: 'RS256',
     });
 
-    return res.status(200).json({ user, token });
+    const userNoPass = user.toObject();
+    delete userNoPass.password;
+
+    return res.status(200).json({ user: userNoPass, token });
   }),
 ];
 
