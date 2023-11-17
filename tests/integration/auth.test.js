@@ -186,6 +186,18 @@ describe('Auth controllers', () => {
       const res = await request(app).post('/api/auth/register').send({ data });
       expect(res.body.token).toBeTruthy();
     });
+
+    test('responds without password when register successful', async () => {
+      const data = {
+        firstName: 'Second',
+        lastName: 'Dude',
+        email: 'user2@email.com',
+        password: '1234password5678',
+      };
+
+      const res = await request(app).post('/api/auth/register').send({ data });
+      expect(res.body.user.password).not.toBeTruthy();
+    });
   });
 
   describe('Login route', () => {
