@@ -383,5 +383,21 @@ describe('Auth controllers', () => {
 
       expect(res.body.token).toBeTruthy();
     });
+
+    test('responds without password when register successful', async () => {
+      const loginData = {
+        firstName: 'Billy',
+        lastName: 'Madison',
+        email: 'billy@email.com',
+        password: '1234password5678',
+      };
+
+      const res = await request(app)
+        .post('/api/auth/login')
+        .send({
+          data: { email: loginData.email, password: loginData.password },
+        });
+      expect(res.body.user.password).not.toBeTruthy();
+    });
   });
 });
