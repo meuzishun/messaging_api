@@ -51,12 +51,15 @@ const registerUser = [
 
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    const user = await User.create({
+    const newUser = await User.create({
       firstName,
       lastName,
       email,
       password: hashedPassword,
     });
+
+    const user = newUser.toObject();
+    delete user.password;
 
     const token = jwt.sign({ id: user._id }, PRIV_KEY, {
       expiresIn: '10d',
