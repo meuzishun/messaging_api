@@ -6,22 +6,17 @@ const User = require('../models/user');
 // @route   GET /api/contacts
 // @access  Private
 const getContacts = asyncHandler(async (req, res) => {
-  const user = await User.findById(req.body.user._id).populate('friends');
+  const user = await User.findById(req.body.user._id).populate(
+    'friends',
+    '-password -friends'
+  );
 
   if (!user) {
     res.status(404);
     throw new Error('No user found');
   }
 
-  const contacts = user.friends.map((friend) => {
-    return {
-      firstName: friend.firstName,
-      lastName: friend.lastName,
-      email: friend.email,
-    };
-  });
-
-  res.status(200).json({ contacts });
+  res.status(200).json({ contacts: user.friends });
 });
 
 // @desc    Add new contact
@@ -60,7 +55,7 @@ const addContact = [
       user._id,
       { $push: { friends: req.body.contactId } },
       { returnDocument: 'after' }
-    );
+    ).populate('friends', '-password -friends');
 
     res.status(201).json({ contacts: updatedUser.friends });
   }),
