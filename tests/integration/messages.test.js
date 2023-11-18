@@ -18,13 +18,13 @@ afterAll(async () => {
   await disconnectMongoServer();
 });
 
-describe('Message routes', () => {
-  test('Messages route exists', async () => {
+describe('Get messages routes', () => {
+  test('exists', async () => {
     const res = await request(app).get('/api/messages');
     expect(res.status).not.toBe(404);
   });
 
-  test('Messages route responds with 200 status when token in header', async () => {
+  test('responds with 200 status when token in header', async () => {
     const { token: debbieToken } = loggedInUsers.find(
       (user) => user.firstName === 'Debbie'
     );
@@ -36,17 +36,17 @@ describe('Message routes', () => {
     expect(res.status).toBe(200);
   });
 
-  test('Messages route responds with 401 error when no token in header', async () => {
+  test('responds with 401 error when no token in header', async () => {
     const res = await request(app).get('/api/messages');
     expect(res.status).toBe(401);
   });
 
-  test('Messages route responds with error msg when no token in header', async () => {
+  test('responds with error msg when no token in header', async () => {
     const res = await request(app).get('/api/messages');
     expect(res.error.text).toContain('Not authorized, no token');
   });
 
-  test('Messages route responds with an array when user is signed in', async () => {
+  test('responds with an array when user is signed in', async () => {
     const { token: debbieToken } = loggedInUsers.find(
       (user) => user.firstName === 'Debbie'
     );
@@ -58,12 +58,85 @@ describe('Message routes', () => {
     expect(res.body.messages).toBeInstanceOf(Array);
   });
 
-  test('New message route exists', async () => {
+  test('responds with empty array when user has no messages', async () => {
+    const { token: user4Token } = loggedInUsers.find(
+      (user) => user.firstName === 'Fourth'
+    );
+    const user4Messages = await request(app)
+      .get('/api/messages')
+      .set('Authorization', `Bearer ${user4Token}`);
+
+    expect(user4Messages.body.messages).toHaveLength(0);
+  });
+
+  test('responds with array of length 1 when only one message thread exists', async () => {
+    const { token: user10token } = loggedInUsers.find(
+      (user) => user.firstName === 'Tenth'
+    );
+
+    await request(app)
+      .post('/api/messages')
+      .set('Authorization', `Bearer ${user10token}`)
+      .send({
+        data: {
+          content: 'I am a test message.',
+        },
+      });
+
+    const res = await request(app)
+      .get('/api/messages')
+      .set('Authorization', `Bearer ${user10token}`);
+
+    expect(res.body.messages.length).toBe(1);
+  });
+
+  test('responds with populated author data with firstName and lastName properties', async () => {
+    const { token: user1Token, _id: user1id } = loggedInUsers.find(
+      (user) => user.firstName === 'User'
+    );
+
+    const res = await request(app)
+      .get('/api/messages')
+      .set('Authorization', `Bearer ${user1Token}`);
+
+    const authors = res.body.messages
+      .flat(Infinity)
+      .map((message) => message.author);
+
+    for (const author of authors) {
+      expect(author).toHaveProperty('firstName');
+      expect(author).toHaveProperty('lastName');
+    }
+  });
+
+  test('responds with populated author data without unnecessary properties', async () => {
+    const { token: user1Token, _id: user1id } = loggedInUsers.find(
+      (user) => user.firstName === 'User'
+    );
+
+    const res = await request(app)
+      .get('/api/messages')
+      .set('Authorization', `Bearer ${user1Token}`);
+
+    const authors = res.body.messages
+      .flat(Infinity)
+      .map((message) => message.author);
+
+    for (const author of authors) {
+      expect(author).not.toHaveProperty('email');
+      expect(author).not.toHaveProperty('password');
+      expect(author).not.toHaveProperty('friends');
+    }
+  });
+});
+
+describe('New message route', () => {
+  test('exists', async () => {
     const res = await request(app).post('/api/messages');
     expect(res.status).not.toBe(404);
   });
 
-  test('New message route responds with 400 status when no body is sent', async () => {
+  test('responds with 400 status when no body is sent', async () => {
     const { token: maggieToken } = loggedInUsers.find(
       (user) => user.firstName === 'Maggie'
     );
@@ -75,7 +148,7 @@ describe('Message routes', () => {
     expect(res.status).toBe(400);
   });
 
-  test('New message route responds with error msg when no body is sent', async () => {
+  test('responds with error msg when no body is sent', async () => {
     const { token: maggieToken } = loggedInUsers.find(
       (user) => user.firstName === 'Maggie'
     );
@@ -88,7 +161,7 @@ describe('Message routes', () => {
   });
 
   //? not sure this test is needed
-  test('New message route responds with 400 status when no content is included', async () => {
+  test('responds with 400 status when no content is included', async () => {
     const { token: maggieToken } = loggedInUsers.find(
       (user) => user.firstName === 'Maggie'
     );
@@ -101,7 +174,7 @@ describe('Message routes', () => {
   });
 
   //? not sure this test is needed
-  test('New message route responds with error msg when no content is included', async () => {
+  test('responds with error msg when no content is included', async () => {
     const { token: maggieToken } = loggedInUsers.find(
       (user) => user.firstName === 'Maggie'
     );
@@ -113,7 +186,7 @@ describe('Message routes', () => {
     expect(res.error.text).toContain('Message has no content');
   });
 
-  test('New message route responds with 401 status when token is not included in header', async () => {
+  test('responds with 401 status when token is not included in header', async () => {
     const res = await request(app)
       .post('/api/messages')
       .send({
@@ -125,7 +198,7 @@ describe('Message routes', () => {
     expect(res.status).toBe(401);
   });
 
-  test('New message route responds with error msg when token is not included in header', async () => {
+  test('responds with error msg when token is not included in header', async () => {
     const res = await request(app)
       .post('/api/messages')
       .send({
@@ -137,7 +210,7 @@ describe('Message routes', () => {
     expect(res.error.text).toContain('Not authorized, no token');
   });
 
-  test('New message route responds with 201 status when new message submission is successful', async () => {
+  test('responds with 201 status when new message submission is successful', async () => {
     const { token: maggieToken } = loggedInUsers.find(
       (user) => user.firstName === 'Maggie'
     );
@@ -154,7 +227,7 @@ describe('Message routes', () => {
     expect(res.status).toBe(201);
   });
 
-  test('New message route responds with message when new message submission is successful', async () => {
+  test('responds with message when new message submission is successful', async () => {
     const { token: maggieToken } = loggedInUsers.find(
       (user) => user.firstName === 'Maggie'
     );
@@ -171,199 +244,7 @@ describe('Message routes', () => {
     expect(res.body.message.content).toEqual('Yo planet!');
   });
 
-  test('Single message route exists', async () => {
-    //! This is a strange test. If you don't include a legit-looking document id in the url, a 200 status is sent, bypassing any conditional checks in the controller. In short, may need to be rewritten or perhaps not included at all.
-    const res = await request(app).get('/api/messages/123');
-    expect(res.status).not.toBe(404);
-  });
-
-  test('Single message route responds with 400 when message id is wrong format', async () => {
-    const { token: maggieToken } = loggedInUsers.find(
-      (user) => user.firstName === 'Maggie'
-    );
-
-    const res = await request(app)
-      .get('/api/messages/123')
-      .set('Authorization', `Bearer ${maggieToken}`);
-
-    expect(res.status).toBe(400);
-  });
-
-  test('Single message route responds with error msg when message id is wrong format', async () => {
-    const { token: maggieToken } = loggedInUsers.find(
-      (user) => user.firstName === 'Maggie'
-    );
-
-    const res = await request(app)
-      .get('/api/messages/123')
-      .set('Authorization', `Bearer ${maggieToken}`);
-
-    expect(res.error.text).toContain('Invalid message ID');
-  });
-
-  //? How can you honestly test for this? Maybe figure out which part of the id is the date? Maybe run this test with a cleared db?
-  test('Single message route responds with 404 when message does not exist', async () => {
-    const { token: maggieToken } = loggedInUsers.find(
-      (user) => user.firstName === 'Maggie'
-    );
-
-    const res = await request(app)
-      .get('/api/messages/615a8be41c2b20f6e47c256d')
-      .set('Authorization', `Bearer ${maggieToken}`);
-
-    expect(res.status).toBe(404);
-  });
-
-  //? How can you honestly test for this? Maybe figure out which part of the id is the date? Maybe run this test with a cleared db?
-  test('Single message route responds with error msg when message does not exist', async () => {
-    const { token: maggieToken } = loggedInUsers.find(
-      (user) => user.firstName === 'Maggie'
-    );
-
-    const res = await request(app)
-      .get('/api/messages/615a8be41c2b20f6e47c256d')
-      .set('Authorization', `Bearer ${maggieToken}`);
-
-    expect(res.error.text).toContain('No message found with id');
-  });
-
-  test('Single message route responds with 401 when token not in header', async () => {
-    const { token: debbieToken } = loggedInUsers.find(
-      (user) => user.firstName === 'Debbie'
-    );
-
-    const msgRes = await request(app)
-      .post('/api/messages')
-      .set('Authorization', `Bearer ${debbieToken}`)
-      .send({
-        data: {
-          content: 'I am the Mom',
-        },
-      });
-
-    const res = await request(app).get(
-      `/api/messages/${msgRes.body.message._id}`
-    );
-
-    expect(res.status).toBe(401);
-  });
-
-  test('Single message route responds with error msg when token not in header', async () => {
-    const { token: maggieToken } = loggedInUsers.find(
-      (user) => user.firstName === 'Maggie'
-    );
-
-    const msgRes = await request(app)
-      .post('/api/messages')
-      .set('Authorization', `Bearer ${maggieToken}`)
-      .send({
-        data: {
-          content: 'I am the dog',
-        },
-      });
-
-    const res = await request(app).get(
-      `/api/messages/${msgRes.body.message._id}`
-    );
-
-    expect(res.error.text).toContain('Not authorized, no token');
-  });
-
-  test('Single message route responds with 401 when author id does not match token', async () => {
-    const { token: debbieToken } = loggedInUsers.find(
-      (user) => user.firstName === 'Debbie'
-    );
-
-    const { token: maggieToken } = loggedInUsers.find(
-      (user) => user.firstName === 'Maggie'
-    );
-
-    const msgRes = await request(app)
-      .post('/api/messages')
-      .set('Authorization', `Bearer ${debbieToken}`)
-      .send({
-        data: {
-          content: 'Get off the couch!',
-        },
-      });
-
-    const res = await request(app)
-      .get(`/api/messages/${msgRes.body.message._id}`)
-      .set('Authorization', `Bearer ${maggieToken}`);
-
-    expect(res.status).toBe(401);
-  });
-
-  test('Single message route responds with error msg when author id does not match token', async () => {
-    const { token: debbieToken } = loggedInUsers.find(
-      (user) => user.firstName === 'Debbie'
-    );
-
-    const { token: maggieToken } = loggedInUsers.find(
-      (user) => user.firstName === 'Maggie'
-    );
-
-    const msgRes = await request(app)
-      .post('/api/messages')
-      .set('Authorization', `Bearer ${maggieToken}`)
-      .send({
-        data: {
-          content: 'But I am tired...',
-        },
-      });
-
-    const res = await request(app)
-      .get(`/api/messages/${msgRes.body.message._id}`)
-      .set('Authorization', `Bearer ${debbieToken}`);
-
-    expect(res.error.text).toContain(
-      'Not authorized, message not authored by user'
-    );
-  });
-
-  test('Single message route responds with 200 when message exists', async () => {
-    const { token: maggieToken } = loggedInUsers.find(
-      (user) => user.firstName === 'Maggie'
-    );
-
-    const msgRes = await request(app)
-      .post('/api/messages')
-      .set('Authorization', `Bearer ${maggieToken}`)
-      .send({
-        data: {
-          content: 'I am ALIVE!!!',
-        },
-      });
-
-    const res = await request(app)
-      .get(`/api/messages/${msgRes.body.message._id}`)
-      .set('Authorization', `Bearer ${maggieToken}`);
-
-    expect(res.status).toBe(200);
-  });
-
-  test('Single message route responds with message when it exists', async () => {
-    const { token: maggieToken } = loggedInUsers.find(
-      (user) => user.firstName === 'Maggie'
-    );
-
-    const msgRes = await request(app)
-      .post('/api/messages')
-      .set('Authorization', `Bearer ${maggieToken}`)
-      .send({
-        data: {
-          content: 'Where am I?',
-        },
-      });
-
-    const res = await request(app)
-      .get(`/api/messages/${msgRes.body.message._id}`)
-      .set('Authorization', `Bearer ${maggieToken}`);
-
-    expect(res.body.message).toBeTruthy();
-  });
-
-  test('New message route responds with 400 status when message body is empty', async () => {
+  test('responds with 400 status when message body is empty', async () => {
     const { token: maggieToken } = loggedInUsers.find(
       (user) => user.firstName === 'Maggie'
     );
@@ -380,7 +261,7 @@ describe('Message routes', () => {
     expect(res.status).toBe(400);
   });
 
-  test('New message route responds with parentId when submitted with one', async () => {
+  test('responds with parentId when submitted with one', async () => {
     const { token: user1Token } = loggedInUsers.find(
       (user) => user.firstName === 'User'
     );
@@ -411,7 +292,7 @@ describe('Message routes', () => {
     expect(msgRes2.body.message.parentId).toBe(msgRes1.body.message._id);
   });
 
-  test('New message route responds without parentId when submitted without one', async () => {
+  test('responds without parentId when submitted without one', async () => {
     const { token: maggieToken } = loggedInUsers.find(
       (user) => user.firstName === 'Maggie'
     );
@@ -432,7 +313,7 @@ describe('Message routes', () => {
     expect(res.body.message.parentId).toBeNull();
   });
 
-  test('do not include participants that were not involved', async () => {
+  test('responds without participants that were not involved', async () => {
     const { token: user1Token, _id: user1id } = loggedInUsers.find(
       (user) => user.firstName === 'User'
     );
@@ -534,7 +415,7 @@ describe('Message routes', () => {
     expect(firstUser1MessageThreadIDs).not.toContain(user3id);
   });
 
-  test('do include participants involved', async () => {
+  test('responds with participants involved', async () => {
     const { token: user1Token, _id: user1id } = loggedInUsers.find(
       (user) => user.firstName === 'User'
     );
@@ -557,19 +438,204 @@ describe('Message routes', () => {
     expect(firstUser1MessageThreadIDs).toContain(user1id);
     expect(firstUser1MessageThreadIDs).toContain(user2id);
   });
+});
 
-  test('getMessages returns empty array when user has no messages', async () => {
-    const { token: user4Token } = loggedInUsers.find(
-      (user) => user.firstName === 'Fourth'
-    );
-    const user4Messages = await request(app)
-      .get('/api/messages')
-      .set('Authorization', `Bearer ${user4Token}`);
-
-    expect(user4Messages.body.messages).toHaveLength(0);
+describe('Get message route', () => {
+  test('exists', async () => {
+    //! This is a strange test. If you don't include a legit-looking document id in the url, a 200 status is sent, bypassing any conditional checks in the controller. In short, may need to be rewritten or perhaps not included at all.
+    const res = await request(app).get('/api/messages/123');
+    expect(res.status).not.toBe(404);
   });
 
-  test('editMessage route responds with 401 when no token in header', async () => {
+  test('responds with 400 when message id is wrong format', async () => {
+    const { token: maggieToken } = loggedInUsers.find(
+      (user) => user.firstName === 'Maggie'
+    );
+
+    const res = await request(app)
+      .get('/api/messages/123')
+      .set('Authorization', `Bearer ${maggieToken}`);
+
+    expect(res.status).toBe(400);
+  });
+
+  test('responds with error msg when message id is wrong format', async () => {
+    const { token: maggieToken } = loggedInUsers.find(
+      (user) => user.firstName === 'Maggie'
+    );
+
+    const res = await request(app)
+      .get('/api/messages/123')
+      .set('Authorization', `Bearer ${maggieToken}`);
+
+    expect(res.error.text).toContain('Invalid message ID');
+  });
+
+  //? How can you honestly test for this? Maybe figure out which part of the id is the date? Maybe run this test with a cleared db?
+  test('responds with 404 when message does not exist', async () => {
+    const { token: maggieToken } = loggedInUsers.find(
+      (user) => user.firstName === 'Maggie'
+    );
+
+    const res = await request(app)
+      .get('/api/messages/615a8be41c2b20f6e47c256d')
+      .set('Authorization', `Bearer ${maggieToken}`);
+
+    expect(res.status).toBe(404);
+  });
+
+  //? How can you honestly test for this? Maybe figure out which part of the id is the date? Maybe run this test with a cleared db?
+  test('responds with error msg when message does not exist', async () => {
+    const { token: maggieToken } = loggedInUsers.find(
+      (user) => user.firstName === 'Maggie'
+    );
+
+    const res = await request(app)
+      .get('/api/messages/615a8be41c2b20f6e47c256d')
+      .set('Authorization', `Bearer ${maggieToken}`);
+
+    expect(res.error.text).toContain('No message found with id');
+  });
+
+  test('responds with 401 when token not in header', async () => {
+    const { token: debbieToken } = loggedInUsers.find(
+      (user) => user.firstName === 'Debbie'
+    );
+
+    const msgRes = await request(app)
+      .post('/api/messages')
+      .set('Authorization', `Bearer ${debbieToken}`)
+      .send({
+        data: {
+          content: 'I am the Mom',
+        },
+      });
+
+    const res = await request(app).get(
+      `/api/messages/${msgRes.body.message._id}`
+    );
+
+    expect(res.status).toBe(401);
+  });
+
+  test('responds with error msg when token not in header', async () => {
+    const { token: maggieToken } = loggedInUsers.find(
+      (user) => user.firstName === 'Maggie'
+    );
+
+    const msgRes = await request(app)
+      .post('/api/messages')
+      .set('Authorization', `Bearer ${maggieToken}`)
+      .send({
+        data: {
+          content: 'I am the dog',
+        },
+      });
+
+    const res = await request(app).get(
+      `/api/messages/${msgRes.body.message._id}`
+    );
+
+    expect(res.error.text).toContain('Not authorized, no token');
+  });
+
+  test('responds with 401 when author id does not match token', async () => {
+    const { token: debbieToken } = loggedInUsers.find(
+      (user) => user.firstName === 'Debbie'
+    );
+
+    const { token: maggieToken } = loggedInUsers.find(
+      (user) => user.firstName === 'Maggie'
+    );
+
+    const msgRes = await request(app)
+      .post('/api/messages')
+      .set('Authorization', `Bearer ${debbieToken}`)
+      .send({
+        data: {
+          content: 'Get off the couch!',
+        },
+      });
+
+    const res = await request(app)
+      .get(`/api/messages/${msgRes.body.message._id}`)
+      .set('Authorization', `Bearer ${maggieToken}`);
+
+    expect(res.status).toBe(401);
+  });
+
+  test('responds with error msg when author id does not match token', async () => {
+    const { token: debbieToken } = loggedInUsers.find(
+      (user) => user.firstName === 'Debbie'
+    );
+
+    const { token: maggieToken } = loggedInUsers.find(
+      (user) => user.firstName === 'Maggie'
+    );
+
+    const msgRes = await request(app)
+      .post('/api/messages')
+      .set('Authorization', `Bearer ${maggieToken}`)
+      .send({
+        data: {
+          content: 'But I am tired...',
+        },
+      });
+
+    const res = await request(app)
+      .get(`/api/messages/${msgRes.body.message._id}`)
+      .set('Authorization', `Bearer ${debbieToken}`);
+
+    expect(res.error.text).toContain(
+      'Not authorized, message not authored by user'
+    );
+  });
+
+  test('responds with 200 when message exists', async () => {
+    const { token: maggieToken } = loggedInUsers.find(
+      (user) => user.firstName === 'Maggie'
+    );
+
+    const msgRes = await request(app)
+      .post('/api/messages')
+      .set('Authorization', `Bearer ${maggieToken}`)
+      .send({
+        data: {
+          content: 'I am ALIVE!!!',
+        },
+      });
+
+    const res = await request(app)
+      .get(`/api/messages/${msgRes.body.message._id}`)
+      .set('Authorization', `Bearer ${maggieToken}`);
+
+    expect(res.status).toBe(200);
+  });
+
+  test('responds with message when it exists', async () => {
+    const { token: maggieToken } = loggedInUsers.find(
+      (user) => user.firstName === 'Maggie'
+    );
+
+    const msgRes = await request(app)
+      .post('/api/messages')
+      .set('Authorization', `Bearer ${maggieToken}`)
+      .send({
+        data: {
+          content: 'Where am I?',
+        },
+      });
+
+    const res = await request(app)
+      .get(`/api/messages/${msgRes.body.message._id}`)
+      .set('Authorization', `Bearer ${maggieToken}`);
+
+    expect(res.body.message).toBeTruthy();
+  });
+});
+
+describe('Edit message route', () => {
+  test('responds with 401 when no token in header', async () => {
     const { token: user1Token } = loggedInUsers.find(
       (user) => user.firstName === 'User'
     );
@@ -591,7 +657,7 @@ describe('Message routes', () => {
     expect(res.status).toBe(401);
   });
 
-  test('editMessage route responds with error msg when no token in header', async () => {
+  test('responds with error msg when no token in header', async () => {
     const { token: user1Token } = loggedInUsers.find(
       (user) => user.firstName === 'User'
     );
@@ -613,7 +679,7 @@ describe('Message routes', () => {
     expect(res.error.text).toContain('Not authorized, no token');
   });
 
-  test('editMessage route responds with 404 when no message exists', async () => {
+  test('responds with 404 when no message exists', async () => {
     const { token: user1Token } = loggedInUsers.find(
       (user) => user.firstName === 'User'
     );
@@ -627,7 +693,7 @@ describe('Message routes', () => {
     expect(res.status).toBe(404);
   });
 
-  test('editMessage route responds with error msg when no message exists', async () => {
+  test('responds with error msg when no message exists', async () => {
     const { token: user1Token } = loggedInUsers.find(
       (user) => user.firstName === 'User'
     );
@@ -641,7 +707,7 @@ describe('Message routes', () => {
     expect(res.error.text).toContain('Message not found');
   });
 
-  test('editMessage route responds with 400 when body data is not sent', async () => {
+  test('responds with 400 when body data is not sent', async () => {
     const { token: user1Token } = loggedInUsers.find(
       (user) => user.firstName === 'User'
     );
@@ -663,7 +729,7 @@ describe('Message routes', () => {
     expect(res.status).toBe(400);
   });
 
-  test('editMessage route responds with error msg when body data is not sent', async () => {
+  test('responds with error msg when body data is not sent', async () => {
     const { token: user1Token } = loggedInUsers.find(
       (user) => user.firstName === 'User'
     );
@@ -685,7 +751,7 @@ describe('Message routes', () => {
     expect(res.error.text).toContain('Message has no content');
   });
 
-  test('edit message responds with 400 when authors do not match', async () => {
+  test('responds with 400 when authors do not match', async () => {
     const { token: debbieToken } = loggedInUsers.find(
       (user) => user.firstName === 'Debbie'
     );
@@ -716,7 +782,7 @@ describe('Message routes', () => {
     expect(res.status).toBe(400);
   });
 
-  test('edit message responds with error msg when authors do not match', async () => {
+  test('responds with error msg when authors do not match', async () => {
     const { token: debbieToken } = loggedInUsers.find(
       (user) => user.firstName === 'Debbie'
     );
@@ -749,7 +815,7 @@ describe('Message routes', () => {
     );
   });
 
-  test('editMessage route responds with 201 when new message is submitted', async () => {
+  test('responds with 201 when new message is submitted', async () => {
     const { token: maggieToken } = loggedInUsers.find(
       (user) => user.firstName === 'Maggie'
     );
@@ -772,7 +838,7 @@ describe('Message routes', () => {
     expect(res.status).toBe(201);
   });
 
-  test('editMessage route responds with new message when edit is successful', async () => {
+  test('responds with new message when edit is successful', async () => {
     const { token: user1Token } = loggedInUsers.find(
       (user) => user.firstName === 'User'
     );
@@ -795,7 +861,7 @@ describe('Message routes', () => {
     expect(res.body.message.content).toBe('I am an awesome edited message');
   });
 
-  test('getMessage route responds with 200 when editMessage route is successful', async () => {
+  test('causes getMessage route to respond with 200 when editMessage route is successful', async () => {
     const { token: user1Token } = loggedInUsers.find(
       (user) => user.firstName === 'User'
     );
@@ -826,7 +892,7 @@ describe('Message routes', () => {
     expect(res.status).toBe(200);
   });
 
-  test('getMessage route responds with correct message when edit is successful', async () => {
+  test('causes getMessage route to respond with correct message when editMessage is successful', async () => {
     const { token: user3Token } = loggedInUsers.find(
       (user) => user.firstName === 'Third'
     );
@@ -859,8 +925,10 @@ describe('Message routes', () => {
       'I am another edited message but I will also be retrieved later'
     );
   });
+});
 
-  test('deleteMessage route responds with 401 when no token in header', async () => {
+describe('Delete message route', () => {
+  test('responds with 401 when no token in header', async () => {
     const { token: user1Token } = loggedInUsers.find(
       (user) => user.firstName === 'User'
     );
@@ -881,7 +949,7 @@ describe('Message routes', () => {
     expect(res.status).toBe(401);
   });
 
-  test('deleteMessage route responds with error msg when no token in header', async () => {
+  test('responds with error msg when no token in header', async () => {
     const { token: user2Token } = loggedInUsers.find(
       (user) => user.firstName === 'Second'
     );
@@ -902,7 +970,7 @@ describe('Message routes', () => {
     expect(res.error.text).toContain('Not authorized, no token');
   });
 
-  test('deleteMessage route responds with 400 status when messageId is invalid', async () => {
+  test('responds with 400 status when messageId is invalid', async () => {
     const { token: maggieToken } = loggedInUsers.find(
       (user) => user.firstName === 'User'
     );
@@ -923,7 +991,7 @@ describe('Message routes', () => {
     expect(res.status).toBe(400);
   });
 
-  test('deleteMessage route responds with error msg when messageId is invalid', async () => {
+  test('responds with error msg when messageId is invalid', async () => {
     const { token: debbieToken } = loggedInUsers.find(
       (user) => user.firstName === 'User'
     );
@@ -944,7 +1012,7 @@ describe('Message routes', () => {
     expect(res.error.text).toContain('Invalid message ID');
   });
 
-  test('deleteMessage route responds with 404 when no message exists', async () => {
+  test('responds with 404 when no message exists', async () => {
     const { token: user1Token } = loggedInUsers.find(
       (user) => user.firstName === 'User'
     );
@@ -957,7 +1025,7 @@ describe('Message routes', () => {
     expect(res.status).toBe(404);
   });
 
-  test('deleteMessage route responds with error msg when no message exists', async () => {
+  test('responds with error msg when no message exists', async () => {
     const { token: user1Token } = loggedInUsers.find(
       (user) => user.firstName === 'User'
     );
@@ -970,7 +1038,7 @@ describe('Message routes', () => {
     expect(res.error.text).toContain('No message found');
   });
 
-  test('deleteMessage responds with 400 when authors do not match', async () => {
+  test('responds with 400 when authors do not match', async () => {
     const { token: debbieToken } = loggedInUsers.find(
       (user) => user.firstName === 'Debbie'
     );
@@ -995,7 +1063,7 @@ describe('Message routes', () => {
     expect(res.status).toBe(400);
   });
 
-  test('deleteMessage responds with error msg when authors do not match', async () => {
+  test('responds with error msg when authors do not match', async () => {
     const { token: debbieToken } = loggedInUsers.find(
       (user) => user.firstName === 'Debbie'
     );
@@ -1022,7 +1090,7 @@ describe('Message routes', () => {
     );
   });
 
-  test('deleteMessage responds with 200 when message is successfully deleted', async () => {
+  test('responds with 200 when message is successfully deleted', async () => {
     const { token: user1Token } = loggedInUsers.find(
       (user) => user.firstName === 'User'
     );
@@ -1043,7 +1111,7 @@ describe('Message routes', () => {
     expect(res.status).toBe(200);
   });
 
-  test('deleteMessage responds with deleted message id when message is successfully deleted', async () => {
+  test('responds with deleted message id when message is successfully deleted', async () => {
     const { token: user2Token } = loggedInUsers.find(
       (user) => user.firstName === 'Second'
     );
@@ -1064,7 +1132,7 @@ describe('Message routes', () => {
     expect(res.body.id).toContain(msgToBeDeletedRes.body.message._id);
   });
 
-  test('getMessage responds with 404 when deleted message id is attempted to be retrieved', async () => {
+  test('causes getMessage to respond with 404 when deleted message id is attempted to be retrieved', async () => {
     const { token: user3Token } = loggedInUsers.find(
       (user) => user.firstName === 'Third'
     );
@@ -1089,7 +1157,7 @@ describe('Message routes', () => {
     expect(res.status).toBe(404);
   });
 
-  test('getMessage responds with error msg when deleted message is attempted to be retrieved', async () => {
+  test('causes getMessage to respond with error msg when deleted message is attempted to be retrieved', async () => {
     const { token: maggieToken } = loggedInUsers.find(
       (user) => user.firstName === 'Maggie'
     );
@@ -1112,67 +1180,5 @@ describe('Message routes', () => {
       .set('Authorization', `Bearer ${maggieToken}`);
 
     expect(res.error.text).toContain('No message found');
-  });
-});
-
-describe('Get message route', () => {
-  test('responds with array of length 1 when only one message thread exists', async () => {
-    const { token: user10token } = loggedInUsers.find(
-      (user) => user.firstName === 'Tenth'
-    );
-
-    await request(app)
-      .post('/api/messages')
-      .set('Authorization', `Bearer ${user10token}`)
-      .send({
-        data: {
-          content: 'I am a test message.',
-        },
-      });
-
-    const res = await request(app)
-      .get('/api/messages')
-      .set('Authorization', `Bearer ${user10token}`);
-
-    expect(res.body.messages.length).toBe(1);
-  });
-
-  test('populates author data with firstName and lastName properties', async () => {
-    const { token: user1Token, _id: user1id } = loggedInUsers.find(
-      (user) => user.firstName === 'User'
-    );
-
-    const res = await request(app)
-      .get('/api/messages')
-      .set('Authorization', `Bearer ${user1Token}`);
-
-    const authors = res.body.messages
-      .flat(Infinity)
-      .map((message) => message.author);
-
-    for (const author of authors) {
-      expect(author).toHaveProperty('firstName');
-      expect(author).toHaveProperty('lastName');
-    }
-  });
-
-  test('populates author data without unnecessary properties', async () => {
-    const { token: user1Token, _id: user1id } = loggedInUsers.find(
-      (user) => user.firstName === 'User'
-    );
-
-    const res = await request(app)
-      .get('/api/messages')
-      .set('Authorization', `Bearer ${user1Token}`);
-
-    const authors = res.body.messages
-      .flat(Infinity)
-      .map((message) => message.author);
-
-    for (const author of authors) {
-      expect(author).not.toHaveProperty('email');
-      expect(author).not.toHaveProperty('password');
-      expect(author).not.toHaveProperty('friends');
-    }
   });
 });
