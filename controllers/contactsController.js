@@ -62,7 +62,7 @@ const addContact = [
       { returnDocument: 'after' }
     );
 
-    res.status(201).json({ user: updatedUser });
+    res.status(201).json({ contacts: updatedUser.friends });
   }),
 ];
 
