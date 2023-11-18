@@ -86,7 +86,10 @@ const getContact = [
       throw new Error('Contact not friend');
     }
 
-    const contact = await User.findById(req.params.contactId);
+    const contact = await User.findById(
+      req.params.contactId,
+      '-password -friends'
+    );
 
     res.status(200).json({ contact });
   }),
