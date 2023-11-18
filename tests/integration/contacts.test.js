@@ -258,7 +258,7 @@ describe('Add contacts route', () => {
     expect(res.status).toBe(201);
   });
 
-  test('responds with updated user', async () => {
+  test('responds with updated friends list', async () => {
     const { token: maggieToken } = loggedInUsers.find(
       (user) => user.firstName === 'Maggie'
     );
@@ -272,7 +272,7 @@ describe('Add contacts route', () => {
       .set('authorization', `Bearer ${maggieToken}`)
       .send({ contactId: debbieUser._id });
 
-    expect(res.body.user.friends).toContain(debbieUser._id);
+    expect(res.body.contacts).toContain(debbieUser._id);
   });
 
   test('get request has updated friends list after contact added', async () => {
