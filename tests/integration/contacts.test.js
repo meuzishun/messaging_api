@@ -540,25 +540,44 @@ describe('Delete contacts route', () => {
     expect(res.status).toBe(201);
   });
 
-  test('responds with altered user when contact is removed', async () => {
+  test('responds with altered friend list when contact is removed', async () => {
     const debbieUser = loggedInUsers.find(
       (user) => user.firstName === 'Debbie'
     );
+
+    const user1 = loggedInUsers.find((user) => user.firstName === 'User');
 
     const { token: maggieToken } = loggedInUsers.find(
       (user) => user.firstName === 'Maggie'
     );
 
+    await request(app)
+      .put('/api/contacts')
+      .set('authorization', `Bearer ${maggieToken}`)
+      .send({ contactId: `${user1._id}` });
+
     const preRes = await request(app)
-      .get('/api/profile')
+      .get('/api/contacts')
       .set('authorization', `Bearer ${maggieToken}`);
 
-    expect(preRes.body.user.friends).toContain(debbieUser._id);
+    expect(preRes.body.contacts.map((contact) => contact._id)).toContain(
+      debbieUser._id
+    );
+
+    expect(preRes.body.contacts.map((contact) => contact._id)).toContain(
+      user1._id
+    );
 
     const res = await request(app)
       .delete(`/api/contacts/${debbieUser._id}`)
       .set('authorization', `Bearer ${maggieToken}`);
 
-    expect(res.body.user.friends).not.toContain(debbieUser._id);
+    expect(res.body.contacts.map((contact) => contact._id)).not.toContain(
+      debbieUser._id
+    );
+
+    expect(res.body.contacts.map((contact) => contact._id)).toContain(
+      user1._id
+    );
   });
 });
