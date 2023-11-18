@@ -124,14 +124,14 @@ const deleteContact = [
       { _id: req.body.user._id },
       { $pull: { friends: req.params.contactId } },
       { new: true }
-    );
+    ).populate('friends', '-password -friends');
 
     if (!updatedUser) {
       res.status(500);
       throw new Error('Updated user error');
     }
 
-    res.status(201).json({ user: updatedUser });
+    res.status(201).json({ contacts: updatedUser.friends });
   }),
 ];
 
