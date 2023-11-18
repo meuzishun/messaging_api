@@ -431,7 +431,38 @@ describe('Get contact route', () => {
       .get(`/api/contacts/${user1._id}`)
       .set('authorization', `Bearer ${user3Token}`);
 
-    expect(res.body.contact).toEqual(newUser1.body.user);
+    expect(res.body.contact.firstName).toEqual(newUser1.body.user.firstName);
+    expect(res.body.contact.lastName).toEqual(newUser1.body.user.lastName);
+    expect(res.body.contact.email).toEqual(newUser1.body.user.email);
+    expect(res.body.contact._id).toEqual(newUser1.body.user._id);
+  });
+
+  test('responds without user password when contact is found', async () => {
+    const user1 = loggedInUsers.find((user) => user.firstName === 'User');
+
+    const { token: user3Token } = loggedInUsers.find(
+      (user) => user.firstName === 'Third'
+    );
+
+    const res = await request(app)
+      .get(`/api/contacts/${user1._id}`)
+      .set('authorization', `Bearer ${user3Token}`);
+
+    expect(res.body.contact).not.toHaveProperty('password');
+  });
+
+  test('responds without user friends when contact is found', async () => {
+    const user1 = loggedInUsers.find((user) => user.firstName === 'User');
+
+    const { token: user3Token } = loggedInUsers.find(
+      (user) => user.firstName === 'Third'
+    );
+
+    const res = await request(app)
+      .get(`/api/contacts/${user1._id}`)
+      .set('authorization', `Bearer ${user3Token}`);
+
+    expect(res.body.contact).not.toHaveProperty('friends');
   });
 });
 
