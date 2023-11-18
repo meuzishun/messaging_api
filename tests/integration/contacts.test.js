@@ -76,17 +76,19 @@ describe('Get contacts route', () => {
       .get('/api/contacts')
       .set('authorization', `Bearer ${user3Token}`);
 
-    expect(res.body.contacts).toContainEqual({
-      firstName: user1.firstName,
-      lastName: user1.lastName,
-      email: user1.email,
-    });
+    const resFirstNames = res.body.contacts.map((contact) => contact.firstName);
+    const resLastNames = res.body.contacts.map((contact) => contact.lastName);
+    const resEmails = res.body.contacts.map((contact) => contact.email);
+    const resIds = res.body.contacts.map((contact) => contact._id);
 
-    expect(res.body.contacts).toContainEqual({
-      firstName: user2.firstName,
-      lastName: user2.lastName,
-      email: user2.email,
-    });
+    expect(resFirstNames).toContain(user1.firstName);
+    expect(resFirstNames).toContain(user2.firstName);
+    expect(resLastNames).toContain(user1.lastName);
+    expect(resLastNames).toContain(user2.lastName);
+    expect(resEmails).toContain(user1.email);
+    expect(resEmails).toContain(user2.email);
+    expect(resIds).toContain(user1._id);
+    expect(resIds).toContain(user2._id);
   });
 
   test("responds with contact's first names", async () => {
@@ -272,7 +274,9 @@ describe('Add contacts route', () => {
       .set('authorization', `Bearer ${maggieToken}`)
       .send({ contactId: debbieUser._id });
 
-    expect(res.body.contacts).toContain(debbieUser._id);
+    expect(res.body.contacts.map((contact) => contact._id)).toContain(
+      debbieUser._id
+    );
   });
 
   test('get request has updated friends list after contact added', async () => {
@@ -288,10 +292,12 @@ describe('Add contacts route', () => {
       .send({ contactId: user2._id });
 
     const res = await request(app)
-      .get('/api/profile')
+      .get('/api/contacts')
       .set('authorization', `Bearer ${user1Token}`);
 
-    expect(res.body.user.friends).toContain(user2._id);
+    expect(res.body.contacts.map((contact) => contact._id)).toContain(
+      user2._id
+    );
   });
 
   test('responds with 400 status when contact id is already a contact', async () => {
