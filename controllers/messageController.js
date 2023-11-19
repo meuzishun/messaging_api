@@ -72,14 +72,16 @@ const getMessage = [
       throw new Error('No user found');
     }
 
-    const message = await Message.findById(req.params.messageId);
+    const message = await Message.findById(req.params.messageId)
+      .populate('author', '-password -friends')
+      .populate('participants', '-password -friends');
 
     if (!message) {
       res.status(404);
       throw new Error('No message found with id');
     }
 
-    if (message.author.toString() !== user._id.toString()) {
+    if (message.author._id.toString() !== user._id.toString()) {
       res.status(401);
       throw new Error('Not authorized, message not authored by user');
     }
