@@ -18,7 +18,7 @@ afterAll(async () => {
   await disconnectMongoServer();
 });
 
-describe.only('Get messages routes', () => {
+describe('Get messages routes', () => {
   test('exists', async () => {
     const res = await request(app).get('/api/messages');
     expect(res.status).not.toBe(404);
