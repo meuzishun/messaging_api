@@ -18,7 +18,7 @@ afterAll(async () => {
   await disconnectMongoServer();
 });
 
-describe('Get messages routes', () => {
+describe.only('Get messages routes', () => {
   test('exists', async () => {
     const res = await request(app).get('/api/messages');
     expect(res.status).not.toBe(404);
@@ -126,6 +126,144 @@ describe('Get messages routes', () => {
       expect(author).not.toHaveProperty('email');
       expect(author).not.toHaveProperty('password');
       expect(author).not.toHaveProperty('friends');
+    }
+  });
+
+  test('responds with array of participants', async () => {
+    const debbieUser = loggedInUsers.find(
+      (user) => user.firstName === 'Debbie'
+    );
+
+    const maggieUser = loggedInUsers.find(
+      (user) => user.firstName === 'Maggie'
+    );
+
+    await request(app)
+      .post('/api/messages')
+      .set('Authorization', `Bearer ${debbieUser.token}`)
+      .send({
+        data: {
+          content: 'Hi Maggie',
+          participants: [debbieUser._id, maggieUser._id],
+        },
+      });
+
+    const res = await request(app)
+      .get('/api/messages')
+      .set('Authorization', `Bearer ${debbieUser.token}`);
+
+    for (const thread of res.body.messages) {
+      for (const message of thread) {
+        expect(Array.isArray(message.participants)).toBe(true);
+      }
+    }
+  });
+
+  test('responds with participants that have first names', async () => {
+    const debbieUser = loggedInUsers.find(
+      (user) => user.firstName === 'Debbie'
+    );
+
+    const res = await request(app)
+      .get('/api/messages')
+      .set('Authorization', `Bearer ${debbieUser.token}`);
+
+    for (const thread of res.body.messages) {
+      for (const message of thread) {
+        for (const participant of message.participants) {
+          expect(participant.firstName).toBeTruthy();
+        }
+      }
+    }
+  });
+
+  test('responds with participants that have last names', async () => {
+    const debbieUser = loggedInUsers.find(
+      (user) => user.firstName === 'Debbie'
+    );
+
+    const res = await request(app)
+      .get('/api/messages')
+      .set('Authorization', `Bearer ${debbieUser.token}`);
+
+    for (const thread of res.body.messages) {
+      for (const message of thread) {
+        for (const participant of message.participants) {
+          expect(participant.lastName).toBeTruthy();
+        }
+      }
+    }
+  });
+
+  test('responds with participants that have emails', async () => {
+    const debbieUser = loggedInUsers.find(
+      (user) => user.firstName === 'Debbie'
+    );
+
+    const res = await request(app)
+      .get('/api/messages')
+      .set('Authorization', `Bearer ${debbieUser.token}`);
+
+    for (const thread of res.body.messages) {
+      for (const message of thread) {
+        for (const participant of message.participants) {
+          expect(participant.email).toBeTruthy();
+        }
+      }
+    }
+  });
+
+  test('responds with participants that have ids', async () => {
+    const debbieUser = loggedInUsers.find(
+      (user) => user.firstName === 'Debbie'
+    );
+
+    const res = await request(app)
+      .get('/api/messages')
+      .set('Authorization', `Bearer ${debbieUser.token}`);
+
+    for (const thread of res.body.messages) {
+      for (const message of thread) {
+        for (const participant of message.participants) {
+          expect(participant._id).toBeTruthy();
+        }
+      }
+    }
+  });
+
+  test('responds with participants that do not have passwords', async () => {
+    const debbieUser = loggedInUsers.find(
+      (user) => user.firstName === 'Debbie'
+    );
+
+    const res = await request(app)
+      .get('/api/messages')
+      .set('Authorization', `Bearer ${debbieUser.token}`);
+
+    for (const thread of res.body.messages) {
+      for (const message of thread) {
+        for (const participant of message.participants) {
+          expect(participant.password).toBeFalsy();
+        }
+      }
+    }
+  });
+
+  test('responds with participants that do not have friends', async () => {
+    const debbieUser = loggedInUsers.find(
+      (user) => user.firstName === 'Debbie'
+    );
+
+    const res = await request(app)
+      .get('/api/messages')
+      .set('Authorization', `Bearer ${debbieUser.token}`);
+
+    for (const thread of res.body.messages) {
+      for (const message of thread) {
+        for (const participant of message.participants) {
+          expect(participant.friends).toBeFalsy();
+        }
+      }
     }
   });
 });
