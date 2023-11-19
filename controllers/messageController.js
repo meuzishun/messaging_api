@@ -21,7 +21,7 @@ const getMessages = asyncHandler(async (req, res) => {
     parentId: null,
   })
     .populate('author', 'firstName lastName')
-    .populate('participants');
+    .populate('participants', '-password -friends');
 
   const threads = heads.map((head) => [head]);
 
@@ -35,7 +35,7 @@ const getMessages = asyncHandler(async (req, res) => {
         parentId: lastMessage._id,
       })
         .populate('author', 'firstName lastName')
-        .populate('participants');
+        .populate('participants', '-password -friends');
 
       if (message) {
         threads[i].push(message);
