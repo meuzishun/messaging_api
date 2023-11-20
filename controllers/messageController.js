@@ -122,7 +122,18 @@ const createMessage = [
       timestamp: new Date(),
     });
 
-    return res.status(201).json({ message });
+    const populatedMessage = await Message.populate(message, [
+      {
+        path: 'author',
+        select: '-password -friends',
+      },
+      {
+        path: 'participants',
+        select: '-password -friends',
+      },
+    ]);
+
+    return res.status(201).json({ message: populatedMessage });
   }),
 ];
 
