@@ -186,7 +186,9 @@ const editMessage = [
         timestamp: new Date(),
       },
       { returnDocument: 'after' }
-    );
+    )
+      .populate('author', '-password -friends')
+      .populate('participants', '-password -friends');
 
     res.status(201).json({ message: newMessage });
   }),
