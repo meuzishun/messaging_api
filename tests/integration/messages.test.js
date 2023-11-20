@@ -1611,6 +1611,325 @@ describe('Edit message route', () => {
       'I am another edited message but I will also be retrieved later'
     );
   });
+
+  test('responds with edited message author', async () => {
+    const { token: user1Token } = loggedInUsers.find(
+      (user) => user.firstName === 'User'
+    );
+
+    const msgToBeEditedRes = await request(app)
+      .post('/api/messages')
+      .set('Authorization', `Bearer ${user1Token}`)
+      .send({
+        data: {
+          content: 'I am a bad message to be edited',
+        },
+      });
+
+    const msgId = msgToBeEditedRes.body.message._id;
+    const res = await request(app)
+      .put(`/api/messages/${msgId}`)
+      .set('Authorization', `Bearer ${user1Token}`)
+      .send({ data: { content: 'Do I have an author?' } });
+
+    expect(res.body.message.author).toBeTruthy();
+  });
+
+  test('responds with edited message author first name', async () => {
+    const { token: user1Token } = loggedInUsers.find(
+      (user) => user.firstName === 'User'
+    );
+
+    const msgToBeEditedRes = await request(app)
+      .post('/api/messages')
+      .set('Authorization', `Bearer ${user1Token}`)
+      .send({
+        data: {
+          content: 'I am a bad message to be edited',
+        },
+      });
+
+    const msgId = msgToBeEditedRes.body.message._id;
+    const res = await request(app)
+      .put(`/api/messages/${msgId}`)
+      .set('Authorization', `Bearer ${user1Token}`)
+      .send({ data: { content: 'Do I have an author first name?' } });
+
+    expect(res.body.message.author.firstName).toBeTruthy();
+  });
+
+  test('responds with edited message author last name', async () => {
+    const { token: user1Token } = loggedInUsers.find(
+      (user) => user.firstName === 'User'
+    );
+
+    const msgToBeEditedRes = await request(app)
+      .post('/api/messages')
+      .set('Authorization', `Bearer ${user1Token}`)
+      .send({
+        data: {
+          content: 'I am a bad message to be edited',
+        },
+      });
+
+    const msgId = msgToBeEditedRes.body.message._id;
+    const res = await request(app)
+      .put(`/api/messages/${msgId}`)
+      .set('Authorization', `Bearer ${user1Token}`)
+      .send({ data: { content: 'Do I have an author last name?' } });
+
+    expect(res.body.message.author.lastName).toBeTruthy();
+  });
+
+  test('responds with edited message author email', async () => {
+    const { token: user1Token } = loggedInUsers.find(
+      (user) => user.firstName === 'User'
+    );
+
+    const msgToBeEditedRes = await request(app)
+      .post('/api/messages')
+      .set('Authorization', `Bearer ${user1Token}`)
+      .send({
+        data: {
+          content: 'I am a bad message to be edited',
+        },
+      });
+
+    const msgId = msgToBeEditedRes.body.message._id;
+    const res = await request(app)
+      .put(`/api/messages/${msgId}`)
+      .set('Authorization', `Bearer ${user1Token}`)
+      .send({ data: { content: 'Do I have an author email?' } });
+
+    expect(res.body.message.author.email).toBeTruthy();
+  });
+
+  test('responds with edited message author id', async () => {
+    const { token: user1Token } = loggedInUsers.find(
+      (user) => user.firstName === 'User'
+    );
+
+    const msgToBeEditedRes = await request(app)
+      .post('/api/messages')
+      .set('Authorization', `Bearer ${user1Token}`)
+      .send({
+        data: {
+          content: 'I am a bad message to be edited',
+        },
+      });
+
+    const msgId = msgToBeEditedRes.body.message._id;
+    const res = await request(app)
+      .put(`/api/messages/${msgId}`)
+      .set('Authorization', `Bearer ${user1Token}`)
+      .send({ data: { content: 'Do I have an author id?' } });
+
+    expect(res.body.message.author._id).toBeTruthy();
+  });
+
+  test('responds without edited message author password', async () => {
+    const { token: user1Token } = loggedInUsers.find(
+      (user) => user.firstName === 'User'
+    );
+
+    const msgToBeEditedRes = await request(app)
+      .post('/api/messages')
+      .set('Authorization', `Bearer ${user1Token}`)
+      .send({
+        data: {
+          content: 'I am a bad message to be edited',
+        },
+      });
+
+    const msgId = msgToBeEditedRes.body.message._id;
+    const res = await request(app)
+      .put(`/api/messages/${msgId}`)
+      .set('Authorization', `Bearer ${user1Token}`)
+      .send({ data: { content: 'Do I have an author password?' } });
+
+    expect(res.body.message.author.password).toBeFalsy();
+  });
+
+  test('responds without edited message author friends', async () => {
+    const { token: user1Token } = loggedInUsers.find(
+      (user) => user.firstName === 'User'
+    );
+
+    const msgToBeEditedRes = await request(app)
+      .post('/api/messages')
+      .set('Authorization', `Bearer ${user1Token}`)
+      .send({
+        data: {
+          content: 'I am a bad message to be edited',
+        },
+      });
+
+    const msgId = msgToBeEditedRes.body.message._id;
+    const res = await request(app)
+      .put(`/api/messages/${msgId}`)
+      .set('Authorization', `Bearer ${user1Token}`)
+      .send({ data: { content: 'Do I have an author friends?' } });
+
+    expect(res.body.message.author.friends).toBeFalsy();
+  });
+
+  test('responds with edited message participants first name', async () => {
+    const { token: user1Token, _id: user1Id } = loggedInUsers.find(
+      (user) => user.firstName === 'User'
+    );
+
+    const msgToBeEditedRes = await request(app)
+      .post('/api/messages')
+      .set('Authorization', `Bearer ${user1Token}`)
+      .send({
+        data: {
+          content: 'I am a bad message to be edited',
+          participants: [user1Id],
+        },
+      });
+
+    const msgId = msgToBeEditedRes.body.message._id;
+    const res = await request(app)
+      .put(`/api/messages/${msgId}`)
+      .set('Authorization', `Bearer ${user1Token}`)
+      .send({ data: { content: 'Does each participant have a first name?' } });
+
+    for (const participant of res.body.message.participants) {
+      expect(participant.firstName).toBeTruthy();
+    }
+  });
+
+  test('responds with edited message participants last name', async () => {
+    const { token: user1Token, _id: user1Id } = loggedInUsers.find(
+      (user) => user.firstName === 'User'
+    );
+
+    const msgToBeEditedRes = await request(app)
+      .post('/api/messages')
+      .set('Authorization', `Bearer ${user1Token}`)
+      .send({
+        data: {
+          content: 'I am a bad message to be edited',
+          participants: [user1Id],
+        },
+      });
+
+    const msgId = msgToBeEditedRes.body.message._id;
+    const res = await request(app)
+      .put(`/api/messages/${msgId}`)
+      .set('Authorization', `Bearer ${user1Token}`)
+      .send({ data: { content: 'Does each participant have a last name?' } });
+
+    for (const participant of res.body.message.participants) {
+      expect(participant.lastName).toBeTruthy();
+    }
+  });
+
+  test('responds with edited message participants email', async () => {
+    const { token: user1Token, _id: user1Id } = loggedInUsers.find(
+      (user) => user.firstName === 'User'
+    );
+
+    const msgToBeEditedRes = await request(app)
+      .post('/api/messages')
+      .set('Authorization', `Bearer ${user1Token}`)
+      .send({
+        data: {
+          content: 'I am a bad message to be edited',
+          participants: [user1Id],
+        },
+      });
+
+    const msgId = msgToBeEditedRes.body.message._id;
+    const res = await request(app)
+      .put(`/api/messages/${msgId}`)
+      .set('Authorization', `Bearer ${user1Token}`)
+      .send({ data: { content: 'Does each participant have an email?' } });
+
+    for (const participant of res.body.message.participants) {
+      expect(participant.email).toBeTruthy();
+    }
+  });
+
+  test('responds with edited message participants id', async () => {
+    const { token: user1Token, _id: user1Id } = loggedInUsers.find(
+      (user) => user.firstName === 'User'
+    );
+
+    const msgToBeEditedRes = await request(app)
+      .post('/api/messages')
+      .set('Authorization', `Bearer ${user1Token}`)
+      .send({
+        data: {
+          content: 'I am a bad message to be edited',
+          participants: [user1Id],
+        },
+      });
+
+    const msgId = msgToBeEditedRes.body.message._id;
+    const res = await request(app)
+      .put(`/api/messages/${msgId}`)
+      .set('Authorization', `Bearer ${user1Token}`)
+      .send({ data: { content: 'Does each participant have an id?' } });
+
+    for (const participant of res.body.message.participants) {
+      expect(participant._id).toBeTruthy();
+    }
+  });
+
+  test('responds without edited message participants password', async () => {
+    const { token: user1Token, _id: user1Id } = loggedInUsers.find(
+      (user) => user.firstName === 'User'
+    );
+
+    const msgToBeEditedRes = await request(app)
+      .post('/api/messages')
+      .set('Authorization', `Bearer ${user1Token}`)
+      .send({
+        data: {
+          content: 'I am a bad message to be edited',
+          participants: [user1Id],
+        },
+      });
+
+    const msgId = msgToBeEditedRes.body.message._id;
+    const res = await request(app)
+      .put(`/api/messages/${msgId}`)
+      .set('Authorization', `Bearer ${user1Token}`)
+      .send({ data: { content: 'Does each participant have a password?' } });
+
+    for (const participant of res.body.message.participants) {
+      expect(participant.password).toBeFalsy();
+    }
+  });
+
+  test('responds without edited message participants friends', async () => {
+    const { token: user1Token, _id: user1Id } = loggedInUsers.find(
+      (user) => user.firstName === 'User'
+    );
+
+    const msgToBeEditedRes = await request(app)
+      .post('/api/messages')
+      .set('Authorization', `Bearer ${user1Token}`)
+      .send({
+        data: {
+          content: 'I am a bad message to be edited',
+          participants: [user1Id],
+        },
+      });
+
+    const msgId = msgToBeEditedRes.body.message._id;
+    const res = await request(app)
+      .put(`/api/messages/${msgId}`)
+      .set('Authorization', `Bearer ${user1Token}`)
+      .send({
+        data: { content: 'Does each participant have a friends list?' },
+      });
+
+    for (const participant of res.body.message.participants) {
+      expect(participant.friends).toBeFalsy();
+    }
+  });
 });
 
 describe('Delete message route', () => {
