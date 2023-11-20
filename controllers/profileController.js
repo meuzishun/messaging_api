@@ -6,7 +6,7 @@ const User = require('../models/user');
 // @route   GET /api/profile
 // @access  Private
 const getProfile = asyncHandler(async (req, res) => {
-  const user = await User.findById(req.body.user._id);
+  const user = await User.findById(req.body.user._id, '-password');
 
   if (!user) {
     res.status(404);
@@ -68,7 +68,10 @@ const editProfile = [
       returnDocument: 'after',
     });
 
-    res.status(201).json({ user: newUser });
+    const userNoPassword = newUser.toObject();
+    delete userNoPassword.password;
+
+    res.status(201).json({ user: userNoPassword });
   }),
 ];
 
