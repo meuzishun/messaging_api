@@ -54,6 +54,18 @@ describe('Get profile route', () => {
     expect(res.body.user.lastName).toBe(maggieUser.lastName);
     expect(res.body.user.email).toBe(maggieUser.email);
   });
+
+  test('responds without password field', async () => {
+    const maggieUser = loggedInUsers.find(
+      (user) => user.firstName === 'Maggie'
+    );
+
+    const res = await request(app)
+      .get('/api/profile')
+      .set('Authorization', `Bearer ${maggieUser.token}`);
+
+    expect(res.body.user.password).toBeFalsy();
+  });
 });
 
 describe('Edit profile route', () => {
@@ -297,6 +309,19 @@ describe('Edit profile route', () => {
       .set('Authorization', `Bearer ${maggieUser.token}`);
 
     expect(res.body.user.email).toBe('maggs@email.com');
+  });
+
+  test('responds without password field', async () => {
+    const maggieUser = loggedInUsers.find(
+      (user) => user.firstName === 'Maggie'
+    );
+
+    const res = await request(app)
+      .put('/api/profile')
+      .set('Authorization', `Bearer ${maggieUser.token}`)
+      .send({ data: { firstName: 'Margo' } });
+
+    expect(res.body.user.password).toBeFalsy();
   });
 });
 
