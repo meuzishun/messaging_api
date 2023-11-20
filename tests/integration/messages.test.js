@@ -348,6 +348,23 @@ describe('New message route', () => {
     expect(res.error.text).toContain('Not authorized, no token');
   });
 
+  test('responds with 400 status when message body is empty', async () => {
+    const { token: maggieToken } = loggedInUsers.find(
+      (user) => user.firstName === 'Maggie'
+    );
+
+    const res = await request(app)
+      .post('/api/messages')
+      .set('Authorization', `Bearer ${maggieToken}`)
+      .send({
+        data: {
+          content: '',
+        },
+      });
+
+    expect(res.status).toBe(400);
+  });
+
   test('responds with 201 status when new message submission is successful', async () => {
     const { token: maggieToken } = loggedInUsers.find(
       (user) => user.firstName === 'Maggie'
@@ -380,23 +397,6 @@ describe('New message route', () => {
       });
 
     expect(res.body.message.content).toEqual('Yo planet!');
-  });
-
-  test('responds with 400 status when message body is empty', async () => {
-    const { token: maggieToken } = loggedInUsers.find(
-      (user) => user.firstName === 'Maggie'
-    );
-
-    const res = await request(app)
-      .post('/api/messages')
-      .set('Authorization', `Bearer ${maggieToken}`)
-      .send({
-        data: {
-          content: '',
-        },
-      });
-
-    expect(res.status).toBe(400);
   });
 
   test('responds with parentId when submitted with one', async () => {
@@ -449,6 +449,132 @@ describe('New message route', () => {
       .set('Authorization', `Bearer ${maggieToken}`);
 
     expect(res.body.message.parentId).toBeNull();
+  });
+
+  test('responds with author field', async () => {
+    const { token: maggieToken, _id: maggieId } = loggedInUsers.find(
+      (user) => user.firstName === 'Maggie'
+    );
+
+    const res = await request(app)
+      .post('/api/messages')
+      .set('Authorization', `Bearer ${maggieToken}`)
+      .send({
+        data: {
+          content: 'Where am I?',
+          participants: [maggieId],
+        },
+      });
+
+    expect(res.body.message.author).toBeTruthy();
+  });
+
+  test('responds with author first name', async () => {
+    const { token: maggieToken, _id: maggieId } = loggedInUsers.find(
+      (user) => user.firstName === 'Maggie'
+    );
+
+    const res = await request(app)
+      .post('/api/messages')
+      .set('Authorization', `Bearer ${maggieToken}`)
+      .send({
+        data: {
+          content: 'Where am I?',
+          participants: [maggieId],
+        },
+      });
+
+    expect(res.body.message.author.firstName).toBeTruthy();
+  });
+
+  test('responds with author last name', async () => {
+    const { token: maggieToken, _id: maggieId } = loggedInUsers.find(
+      (user) => user.firstName === 'Maggie'
+    );
+
+    const res = await request(app)
+      .post('/api/messages')
+      .set('Authorization', `Bearer ${maggieToken}`)
+      .send({
+        data: {
+          content: 'Where am I?',
+          participants: [maggieId],
+        },
+      });
+
+    expect(res.body.message.author.lastName).toBeTruthy();
+  });
+
+  test('responds with author email', async () => {
+    const { token: maggieToken, _id: maggieId } = loggedInUsers.find(
+      (user) => user.firstName === 'Maggie'
+    );
+
+    const res = await request(app)
+      .post('/api/messages')
+      .set('Authorization', `Bearer ${maggieToken}`)
+      .send({
+        data: {
+          content: 'Where am I?',
+          participants: [maggieId],
+        },
+      });
+
+    expect(res.body.message.author.email).toBeTruthy();
+  });
+
+  test('responds with author id', async () => {
+    const { token: maggieToken, _id: maggieId } = loggedInUsers.find(
+      (user) => user.firstName === 'Maggie'
+    );
+
+    const res = await request(app)
+      .post('/api/messages')
+      .set('Authorization', `Bearer ${maggieToken}`)
+      .send({
+        data: {
+          content: 'Where am I?',
+          participants: [maggieId],
+        },
+      });
+
+    expect(res.body.message.author._id).toBeTruthy();
+  });
+
+  test('responds without author password', async () => {
+    const { token: maggieToken, _id: maggieId } = loggedInUsers.find(
+      (user) => user.firstName === 'Maggie'
+    );
+
+    const res = await request(app)
+      .post('/api/messages')
+      .set('Authorization', `Bearer ${maggieToken}`)
+      .send({
+        data: {
+          content: 'Where am I?',
+          participants: [maggieId],
+        },
+      });
+
+    expect(res.body.message.author.password).toBeFalsy();
+  });
+
+  test('responds without author friends', async () => {
+    const { token: maggieToken, _id: maggieId } = loggedInUsers.find(
+      (user) => user.firstName === 'Maggie'
+    );
+
+    const res = await request(app)
+      .post('/api/messages')
+      .set('Authorization', `Bearer ${maggieToken}`)
+      .send({
+        data: {
+          content: 'Where am I?',
+          participants: [maggieId],
+        },
+      });
+
+    expect(res.body.message.author.friends).toBeFalsy();
   });
 
   test('responds without participants that were not involved', async () => {
@@ -575,6 +701,126 @@ describe('New message route', () => {
 
     expect(firstUser1MessageThreadIDs).toContain(user1id);
     expect(firstUser1MessageThreadIDs).toContain(user2id);
+  });
+
+  test('responds with participants first names', async () => {
+    const { token: maggieToken, _id: maggieId } = loggedInUsers.find(
+      (user) => user.firstName === 'Maggie'
+    );
+
+    const res = await request(app)
+      .post('/api/messages')
+      .set('Authorization', `Bearer ${maggieToken}`)
+      .send({
+        data: {
+          content: 'Where am I?',
+          participants: [maggieId],
+        },
+      });
+
+    for (const participant of res.body.message.participants) {
+      expect(participant.firstName).toBeTruthy();
+    }
+  });
+
+  test('responds with participants last names', async () => {
+    const { token: maggieToken, _id: maggieId } = loggedInUsers.find(
+      (user) => user.firstName === 'Maggie'
+    );
+
+    const res = await request(app)
+      .post('/api/messages')
+      .set('Authorization', `Bearer ${maggieToken}`)
+      .send({
+        data: {
+          content: 'Where am I?',
+          participants: [maggieId],
+        },
+      });
+
+    for (const participant of res.body.message.participants) {
+      expect(participant.lastName).toBeTruthy();
+    }
+  });
+
+  test('responds with participants emails', async () => {
+    const { token: maggieToken, _id: maggieId } = loggedInUsers.find(
+      (user) => user.firstName === 'Maggie'
+    );
+
+    const res = await request(app)
+      .post('/api/messages')
+      .set('Authorization', `Bearer ${maggieToken}`)
+      .send({
+        data: {
+          content: 'Where am I?',
+          participants: [maggieId],
+        },
+      });
+
+    for (const participant of res.body.message.participants) {
+      expect(participant.email).toBeTruthy();
+    }
+  });
+
+  test('responds with participants ids', async () => {
+    const { token: maggieToken, _id: maggieId } = loggedInUsers.find(
+      (user) => user.firstName === 'Maggie'
+    );
+
+    const res = await request(app)
+      .post('/api/messages')
+      .set('Authorization', `Bearer ${maggieToken}`)
+      .send({
+        data: {
+          content: 'Where am I?',
+          participants: [maggieId],
+        },
+      });
+
+    for (const participant of res.body.message.participants) {
+      expect(participant._id).toBeTruthy();
+    }
+  });
+
+  test('responds without participants passwords', async () => {
+    const { token: maggieToken, _id: maggieId } = loggedInUsers.find(
+      (user) => user.firstName === 'Maggie'
+    );
+
+    const res = await request(app)
+      .post('/api/messages')
+      .set('Authorization', `Bearer ${maggieToken}`)
+      .send({
+        data: {
+          content: 'Where am I?',
+          participants: [maggieId],
+        },
+      });
+
+    for (const participant of res.body.message.participants) {
+      expect(participant.password).toBeFalsy();
+    }
+  });
+
+  test('responds without participants friends', async () => {
+    const { token: maggieToken, _id: maggieId } = loggedInUsers.find(
+      (user) => user.firstName === 'Maggie'
+    );
+
+    const res = await request(app)
+      .post('/api/messages')
+      .set('Authorization', `Bearer ${maggieToken}`)
+      .send({
+        data: {
+          content: 'Where am I?',
+          participants: [maggieId],
+        },
+      });
+
+    for (const participant of res.body.message.participants) {
+      expect(participant.friends).toBeFalsy();
+    }
   });
 });
 
