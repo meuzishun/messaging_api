@@ -97,7 +97,10 @@ const loginUser = [
 
     const { email, password } = req.body.data;
 
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email }).populate(
+      'friends',
+      '-password -friends'
+    );
 
     if (!user) {
       res.status(400);
