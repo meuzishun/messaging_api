@@ -198,6 +198,19 @@ describe('Auth controllers', () => {
       const res = await request(app).post('/api/auth/register').send({ data });
       expect(res.body.user.password).not.toBeTruthy();
     });
+
+    test('responds with friends array', async () => {
+      const data = {
+        firstName: 'Third',
+        lastName: 'Guy',
+        email: 'user3@email.com',
+        password: '1234password5678',
+        //? are friends needed to truly test this?
+      };
+
+      const res = await request(app).post('/api/auth/register').send({ data });
+      expect(res.body.user.friends).toBeTruthy();
+    });
   });
 
   describe('Login route', () => {
@@ -384,7 +397,68 @@ describe('Auth controllers', () => {
       expect(res.body.token).toBeTruthy();
     });
 
-    test('responds without password when register successful', async () => {
+    test('responds without password when login successful', async () => {
+      const billyData = {
+        firstName: 'Billy',
+        lastName: 'Madison',
+        email: 'billy@email.com',
+        password: '1234password5678',
+      };
+
+      const initBillyLogin = await request(app)
+        .post('/api/auth/login')
+        .send({
+          data: { email: billyData.email, password: billyData.password },
+        });
+
+      const ayakoData = {
+        firstName: 'Ayako',
+        lastName: 'Hattori',
+        email: 'ayako@email.com',
+        password: '1234password5678',
+      };
+
+      const initAyakoLogin = await request(app)
+        .post('/api/auth/login')
+        .send({
+          data: { email: ayakoData.email, password: ayakoData.password },
+        });
+
+      const andrewData = {
+        firstName: 'Andrew',
+        lastName: 'Smith',
+        email: 'asmith@email.com',
+        password: '1234password5678',
+      };
+
+      const initAndrewLogin = await request(app)
+        .post('/api/auth/login')
+        .send({
+          data: { email: andrewData.email, password: andrewData.password },
+        });
+
+      const billyToken = initBillyLogin.body.token;
+
+      await request(app)
+        .put('/api/contacts')
+        .set('authorization', `Bearer ${billyToken}`)
+        .send({ contactId: initAyakoLogin.body.user._id });
+
+      await request(app)
+        .put('/api/contacts')
+        .set('authorization', `Bearer ${billyToken}`)
+        .send({ contactId: initAndrewLogin.body.user._id });
+
+      const res = await request(app)
+        .post('/api/auth/login')
+        .send({
+          data: { email: billyData.email, password: billyData.password },
+        });
+
+      expect(res.body.user.password).toBeFalsy();
+    });
+
+    test('responds with friends array', async () => {
       const loginData = {
         firstName: 'Billy',
         lastName: 'Madison',
@@ -397,7 +471,122 @@ describe('Auth controllers', () => {
         .send({
           data: { email: loginData.email, password: loginData.password },
         });
-      expect(res.body.user.password).not.toBeTruthy();
+
+      expect(res.body.user.friends).toBeTruthy();
+    });
+
+    test('responds with friends array with first names', async () => {
+      const loginData = {
+        firstName: 'Billy',
+        lastName: 'Madison',
+        email: 'billy@email.com',
+        password: '1234password5678',
+      };
+
+      const res = await request(app)
+        .post('/api/auth/login')
+        .send({
+          data: { email: loginData.email, password: loginData.password },
+        });
+
+      for (const friend of res.body.user.friends) {
+        expect(friend.firstName).toBeTruthy();
+      }
+    });
+
+    test('responds with friends array with last names', async () => {
+      const loginData = {
+        firstName: 'Billy',
+        lastName: 'Madison',
+        email: 'billy@email.com',
+        password: '1234password5678',
+      };
+
+      const res = await request(app)
+        .post('/api/auth/login')
+        .send({
+          data: { email: loginData.email, password: loginData.password },
+        });
+
+      for (const friend of res.body.user.friends) {
+        expect(friend.lastName).toBeTruthy();
+      }
+    });
+
+    test('responds with friends array with emails', async () => {
+      const loginData = {
+        firstName: 'Billy',
+        lastName: 'Madison',
+        email: 'billy@email.com',
+        password: '1234password5678',
+      };
+
+      const res = await request(app)
+        .post('/api/auth/login')
+        .send({
+          data: { email: loginData.email, password: loginData.password },
+        });
+
+      for (const friend of res.body.user.friends) {
+        expect(friend.email).toBeTruthy();
+      }
+    });
+
+    test('responds with friends array with ids', async () => {
+      const loginData = {
+        firstName: 'Billy',
+        lastName: 'Madison',
+        email: 'billy@email.com',
+        password: '1234password5678',
+      };
+
+      const res = await request(app)
+        .post('/api/auth/login')
+        .send({
+          data: { email: loginData.email, password: loginData.password },
+        });
+
+      for (const friend of res.body.user.friends) {
+        expect(friend._id).toBeTruthy();
+      }
+    });
+
+    test('responds with friends array with no password fields', async () => {
+      const loginData = {
+        firstName: 'Billy',
+        lastName: 'Madison',
+        email: 'billy@email.com',
+        password: '1234password5678',
+      };
+
+      const res = await request(app)
+        .post('/api/auth/login')
+        .send({
+          data: { email: loginData.email, password: loginData.password },
+        });
+
+      for (const friend of res.body.user.friends) {
+        expect(friend.password).toBeFalsy();
+      }
+    });
+
+    test('responds with friends array with no friends fields', async () => {
+      const loginData = {
+        firstName: 'Billy',
+        lastName: 'Madison',
+        email: 'billy@email.com',
+        password: '1234password5678',
+      };
+
+      const res = await request(app)
+        .post('/api/auth/login')
+        .send({
+          data: { email: loginData.email, password: loginData.password },
+        });
+
+      for (const friend of res.body.user.friends) {
+        expect(friend.friends).toBeFalsy();
+      }
     });
   });
 });
