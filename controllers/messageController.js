@@ -34,7 +34,7 @@ const getMessages = asyncHandler(async (req, res) => {
       let message = await Message.findOne({
         parentId: lastMessage._id,
       })
-        .populate('author', 'firstName lastName')
+        .populate('author', '-password -friends')
         .populate('participants', '-password -friends');
 
       if (message) {
