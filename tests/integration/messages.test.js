@@ -70,7 +70,7 @@ describe('Get messages routes', () => {
   });
 
   test('responds with array of length 1 when only one message thread exists', async () => {
-    const { token: user10token } = loggedInUsers.find(
+    const { token: user10token, _id: user10Id } = loggedInUsers.find(
       (user) => user.firstName === 'Tenth'
     );
 
@@ -80,6 +80,7 @@ describe('Get messages routes', () => {
       .send({
         data: {
           content: 'I am a test message.',
+          participants: [user10Id],
         },
       });
 
@@ -90,14 +91,14 @@ describe('Get messages routes', () => {
     expect(res.body.messages.length).toBe(1);
   });
 
-  test('responds with populated author data with firstName and lastName properties', async () => {
-    const { token: user1Token, _id: user1id } = loggedInUsers.find(
-      (user) => user.firstName === 'User'
+  test('responds with populated author data with firstName, lastName, id and email properties', async () => {
+    const { token: user10Token, _id: user10id } = loggedInUsers.find(
+      (user) => user.firstName === 'Tenth'
     );
 
     const res = await request(app)
       .get('/api/messages')
-      .set('Authorization', `Bearer ${user1Token}`);
+      .set('Authorization', `Bearer ${user10Token}`);
 
     const authors = res.body.messages
       .flat(Infinity)
@@ -106,24 +107,25 @@ describe('Get messages routes', () => {
     for (const author of authors) {
       expect(author).toHaveProperty('firstName');
       expect(author).toHaveProperty('lastName');
+      expect(author).toHaveProperty('_id');
+      expect(author).toHaveProperty('email');
     }
   });
 
   test('responds with populated author data without unnecessary properties', async () => {
-    const { token: user1Token, _id: user1id } = loggedInUsers.find(
-      (user) => user.firstName === 'User'
+    const { token: user10Token, _id: user10id } = loggedInUsers.find(
+      (user) => user.firstName === 'Tenth'
     );
 
     const res = await request(app)
       .get('/api/messages')
-      .set('Authorization', `Bearer ${user1Token}`);
+      .set('Authorization', `Bearer ${user10Token}`);
 
     const authors = res.body.messages
       .flat(Infinity)
       .map((message) => message.author);
 
     for (const author of authors) {
-      expect(author).not.toHaveProperty('email');
       expect(author).not.toHaveProperty('password');
       expect(author).not.toHaveProperty('friends');
     }
