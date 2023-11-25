@@ -20,7 +20,7 @@ const getMessages = asyncHandler(async (req, res) => {
     $or: [{ participants: user._id }, { author: user._id }],
     parentId: null,
   })
-    .populate('author', 'firstName lastName')
+    .populate('author', '-password -friends')
     .populate('participants', '-password -friends');
 
   const threads = heads.map((head) => [head]);
