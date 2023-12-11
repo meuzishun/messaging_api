@@ -17,6 +17,7 @@ const whitelist = [
   'https://meuzishun.github.io',
   'http://127.0.0.1:5173',
   'https://desktop.postman.com',
+  'https://messaging-api-twex.onrender.com',
 ];
 
 const corsOptions = {
