@@ -10,7 +10,7 @@ const errorHandler = require('./middleware/errorMiddleware');
 
 const limiter = RateLimit({
   windowMs: 1 * 60 * 1000,
-  max: 20,
+  max: 100,
 });
 
 const whitelist = [
