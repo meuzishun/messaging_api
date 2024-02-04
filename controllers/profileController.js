@@ -6,7 +6,10 @@ const User = require('../models/user');
 // @route   GET /api/profile
 // @access  Private
 const getProfile = asyncHandler(async (req, res) => {
-  const user = await User.findById(req.body.user._id, '-password');
+  const user = await User.findById(
+    req.body.user._id,
+    '-password -friends -__v -_id'
+  );
 
   if (!user) {
     res.status(404);
