@@ -73,6 +73,9 @@ const editProfile = [
 
     const userNoPassword = newUser.toObject();
     delete userNoPassword.password;
+    delete userNoPassword.friends;
+    delete userNoPassword.__v;
+    delete userNoPassword.__id;
 
     res.status(201).json({ user: userNoPassword });
   }),
