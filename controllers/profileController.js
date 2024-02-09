@@ -75,7 +75,7 @@ const editProfile = [
     delete userNoPassword.password;
     delete userNoPassword.friends;
     delete userNoPassword.__v;
-    delete userNoPassword.__id;
+    delete userNoPassword._id;
 
     res.status(201).json({ user: userNoPassword });
   }),
