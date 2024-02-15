@@ -8,7 +8,7 @@ const User = require('../models/user');
 const getProfile = asyncHandler(async (req, res) => {
   const user = await User.findById(
     req.body.user._id,
-    '-password -friends -__v -_id'
+    '-password' //TODO: Only remove password here...
   );
 
   if (!user) {
@@ -73,9 +73,6 @@ const editProfile = [
 
     const userNoPassword = newUser.toObject();
     delete userNoPassword.password;
-    delete userNoPassword.friends;
-    delete userNoPassword.__v;
-    delete userNoPassword._id;
 
     res.status(201).json({ user: userNoPassword });
   }),
