@@ -21,8 +21,7 @@ const whitelist = [
 
 const corsOptions = {
   origin: function (origin, callback) {
-    console.log(origin);
-    if (whitelist.includes(origin)) {
+    if (whitelist.includes(origin || !origin)) {
       callback(null, true);
     } else {
       callback(new Error('Not allowed by CORS'));
@@ -32,12 +31,12 @@ const corsOptions = {
 
 const app = express();
 genKeyPair();
+app.use(cors(corsOptions));
 
 if (process.env.NODE_ENV === 'Production') {
   app.use(limiter);
   app.use(compression());
   app.use(helmet());
-  app.use(cors(corsOptions));
 }
 
 app.use(express.json());
