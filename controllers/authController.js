@@ -1,13 +1,18 @@
-const fs = require('fs');
-const path = require('path');
+require('dotenv').config();
 const { body, validationResult } = require('express-validator');
 const asyncHandler = require('express-async-handler');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const bcrypt = require('bcryptjs');
 
-const pathToKey = path.join(__dirname, '..', '/id_rsa_priv.pem');
-const PRIV_KEY = fs.readFileSync(pathToKey, 'utf8');
+let PRIV_KEY = process.env.PRIV_KEY;
+
+if (!PRIV_KEY) {
+  console.error('PRIV_KEY environment variable is not set');
+  process.exit(1); // Exit the application if the private key is not set
+}
+
+PRIV_KEY = PRIV_KEY.replace(/\\n/g, '\n');
 
 // @desc    Register user
 // @route   POST /api/register
