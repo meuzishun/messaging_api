@@ -17,14 +17,14 @@ const limiter = RateLimit({
 });
 
 const whitelist = [
-  'https://meuzishun.github.io',
+  'https://meuzishun.github.io/messaging_ui',
   'http://127.0.0.1:5173',
   'http://localhost:5173',
 ];
 
 const corsOptions = {
   origin: function (origin, callback) {
-    if (whitelist.includes(origin || !origin)) {
+    if (whitelist.includes(origin)) {
       callback(null, true);
     } else {
       callback(new Error('Not allowed by CORS'));
