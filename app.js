@@ -1,7 +1,7 @@
 require('dotenv').config();
-if (process.env.NODE_ENV === 'production') {
-  require('./lib/generateKeyPair');
-}
+// if (process.env.NODE_ENV === 'production') {
+//   require('./lib/generateKeyPair');
+// }
 const express = require('express');
 const cors = require('cors');
 const compression = require('compression');

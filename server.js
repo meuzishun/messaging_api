@@ -1,4 +1,5 @@
 require('dotenv').config();
+require('./lib/generateKeyPair');
 const app = require('./app');
 const { connectDB } = require('./config/database');
 
