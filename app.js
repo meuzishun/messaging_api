@@ -1,10 +1,13 @@
 require('dotenv').config();
+if (process.env.NODE_ENV === 'production') {
+  require('./lib/generateKeyPair');
+}
 const express = require('express');
 const cors = require('cors');
 const compression = require('compression');
 const helmet = require('helmet');
 const RateLimit = require('express-rate-limit');
-const genKeyPair = require('./lib/generateKeyPair');
+// const genKeyPair = require('./lib/generateKeyPair');
 const routes = require('./routes/index');
 const errorHandler = require('./middleware/errorMiddleware');
 
@@ -30,7 +33,7 @@ const corsOptions = {
 };
 
 const app = express();
-genKeyPair();
+// genKeyPair();
 app.use(cors(corsOptions));
 
 if (process.env.NODE_ENV === 'Production') {
