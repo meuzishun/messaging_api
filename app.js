@@ -14,11 +14,11 @@ const errorHandler = require('./middleware/errorMiddleware');
 const limiter = RateLimit({
   windowMs: 1 * 60 * 1000,
   max: 100,
-  validate: { xForwardedForHeader: false },
 });
 
 const whitelist = [
   'https://meuzishun.github.io/messaging_ui',
+  'https://meuzishun.github.io',
   'http://127.0.0.1:5173',
   'http://localhost:5173',
 ];
