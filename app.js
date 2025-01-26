@@ -25,19 +25,22 @@ const whitelist = [
 
 const corsOptions = {
   origin: function (origin, callback) {
-    if (whitelist.includes(origin)) {
+    console.log('Origin:', origin); // Log the incoming origin
+    if (!origin || whitelist.includes(origin)) {
       callback(null, true);
     } else {
-      callback(new Error('Not allowed by CORS'));
+      callback(new Error(`Not allowed by CORS: ${origin}`));
     }
   },
 };
 
 const app = express();
+app.options('*', cors(corsOptions));
+
 // genKeyPair();
 app.use(cors(corsOptions));
 
-// if (process.env.NODE_ENV === 'Production') {
+// if (process.env.NODE_ENV === 'production') {
 app.use(limiter);
 app.use(compression());
 app.use(helmet());
