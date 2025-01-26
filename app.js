@@ -19,6 +19,7 @@ const limiter = RateLimit({
 
 const whitelist = [
   'https://meuzishun.github.io/messaging_ui',
+  'https://meuzishun.github.io',
   'http://127.0.0.1:5173',
   'http://localhost:5173',
 ];
