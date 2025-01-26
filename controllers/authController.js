@@ -96,6 +96,8 @@ const loginUser = [
   body('data.password').notEmpty().withMessage('No password'),
 
   asyncHandler(async (req, res) => {
+    console.log('Request received by api:');
+    console.log(req.body);
     const errors = validationResult(req);
 
     if (!errors.isEmpty()) {
