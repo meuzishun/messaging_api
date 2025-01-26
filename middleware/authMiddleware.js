@@ -5,8 +5,6 @@ const User = require('../models/user');
 const fs = require('fs');
 const path = require('path');
 
-// let PRIV_KEY = process.env.PRIV_KEY;
-
 const pathToKey = path.join(__dirname, '..', 'id_rsa_pub.pem');
 const PUB_KEY = fs.readFileSync(pathToKey, 'utf8');
 
@@ -14,8 +12,6 @@ if (!PUB_KEY) {
   console.error('PUB_KEY environment variable is not set');
   process.exit(1); // Exit the application if the private key is not set
 }
-
-// PRIV_KEY = PRIV_KEY.replace(/\\n/g, '\n');
 
 const authHandler = asyncHandler(async (req, res, next) => {
   if (
