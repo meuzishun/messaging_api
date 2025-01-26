@@ -36,6 +36,7 @@ const corsOptions = {
 
 const app = express();
 app.options('*', cors(corsOptions));
+app.set('trust proxy', 1); // Trust the first proxy
 
 // genKeyPair();
 app.use(cors(corsOptions));
